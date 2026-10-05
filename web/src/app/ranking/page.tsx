@@ -6,6 +6,7 @@ import { YearSelect } from "@/components/ui/year-select";
 import { PaginationLinks } from "@/components/ui/pagination-links";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchAvatar } from "@/components/search-avatar";
+import { TableTools } from "@/components/actions/table-tools";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,7 @@ function BensTable({
 
   return (
     <div className="table-wrap">
+      <TableTools filename="ranking-bens" />
       <div className="overflow-x-auto">
         <table className="table min-w-[640px]">
           <thead>
@@ -175,6 +177,7 @@ function CrescimentoTable({
 
   return (
     <div className="table-wrap">
+      <TableTools filename="ranking-crescimento" />
       <div className="overflow-x-auto">
         <table className="table min-w-[720px]">
           <thead>

@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/shell/shell-context";
 import { PaginationLinks } from "@/components/ui/pagination-links";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchAvatar } from "@/components/search-avatar";
+import { TableTools } from "@/components/actions/table-tools";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,7 @@ export default async function EmendasPage({ searchParams }: PageProps<"/emendas"
           <EmptyState icon="◌" title={q ? "nada para essa busca." : "nenhuma emenda pra empresa encontrada."} />
         ) : (
           <div className="table-wrap">
+            <TableTools filename="emendas" />
             <div className="overflow-x-auto">
               <table className="table min-w-[680px]">
                 <thead>

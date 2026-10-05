@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
+  GitCompareArrows,
   Handshake,
   House,
   Landmark,
@@ -14,11 +15,13 @@ import {
   Repeat,
   Search,
   Sparkles,
+  Star,
   Wallet,
   X,
 } from "lucide-react";
 import type { SidebarCounts } from "@/lib/stats";
 import { Logo } from "@/components/brand/logo";
+import { COMPARE_KEY, FAVORITES_KEY, useSavedList } from "@/lib/local-store";
 import { useShell } from "./shell-context";
 
 type NavLink = { href: string; label: string; icon: LucideIcon; count?: number; alert?: boolean };
@@ -26,6 +29,8 @@ type NavLink = { href: string; label: string; icon: LucideIcon; count?: number; 
 export function Sidebar({ counts }: { counts: SidebarCounts }) {
   const pathname = usePathname();
   const { setPaletteOpen, navOpen, setNavOpen } = useShell();
+  const favorites = useSavedList(FAVORITES_KEY);
+  const compare = useSavedList(COMPARE_KEY);
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => {
@@ -37,6 +42,7 @@ export function Sidebar({ counts }: { counts: SidebarCounts }) {
     { href: "/grafo", label: "Grafo de correlações", icon: Network },
     { href: "/ranking", label: "Bens declarados", icon: Wallet },
     { href: "/emendas", label: "Emendas parlamentares", icon: Landmark },
+    { href: "/comparar", label: "Comparar candidatos", icon: GitCompareArrows, count: compare.items.length || undefined },
   ];
   const sinais: NavLink[] = [
     { href: "/sinais/doacao-circular", label: "Doação circular", icon: Repeat, count: counts.circularDonations, alert: true },
@@ -69,6 +75,34 @@ export function Sidebar({ counts }: { counts: SidebarCounts }) {
         </button>
 
         <nav className="app-sidebar__nav" aria-label="Navegação principal">
+          {favorites.items.length > 0 ? (
+            <div className="app-sidebar__group">
+              <div className="label">Favoritos</div>
+              <div className="navmenu__items">
+                {favorites.items.map((f) => (
+                  <div key={f.href} className="navfav">
+                    <Link
+                      href={f.href}
+                      className={`navitem${pathname === f.href ? " is-active" : ""}`}
+                      aria-current={pathname === f.href ? "page" : undefined}
+                      title={f.sub ? `${f.label} · ${f.sub}` : f.label}
+                    >
+                      <Star size={15} aria-hidden fill="currentColor" className="navfav__star" />
+                      <span className="navfav__label">{f.label}</span>
+                    </Link>
+                    <button
+                      type="button"
+                      className="navfav__remove"
+                      onClick={() => favorites.remove(f.href)}
+                      aria-label={`Remover ${f.label} dos favoritos`}
+                    >
+                      <X size={13} aria-hidden />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <div className="app-sidebar__group">
             <div className="navmenu__items">
               {top.map((l) => (

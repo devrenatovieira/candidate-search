@@ -2,7 +2,8 @@
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useProgressRouter } from "@/components/shell/navigation-progress";
 import {
   Background,
   Controls,
@@ -75,7 +76,7 @@ function toFlowNode(n: GraphNodeInfo, x: number, y: number, loading = false): Fl
 }
 
 function GraphCanvasInner() {
-  const router = useRouter();
+  const router = useProgressRouter();
   const colorMode = useColorMode();
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<FlowEdge>([]);

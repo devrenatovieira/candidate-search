@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useProgressRouter } from "@/components/shell/navigation-progress";
 import { expenseCategoryLabel } from "@/lib/format";
 
 /** Imports its own label lookup: function props can't cross the Server -> Client boundary. */
@@ -12,7 +12,7 @@ export function ExpenseCategorySelect({
   value?: string;
   allLabel?: string;
 }) {
-  const router = useRouter();
+  const router = useProgressRouter();
 
   return (
     <label className="flex items-center gap-2">

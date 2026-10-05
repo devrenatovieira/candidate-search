@@ -11,6 +11,7 @@ import { DateRangePicker } from "./ui/date-range-picker";
 import { EmptyState } from "./ui/empty-state";
 import { SearchAvatar } from "./search-avatar";
 import { SourceZone } from "./source-zone";
+import { TableTools } from "@/components/actions/table-tools";
 
 type Props = {
   title: string;
@@ -282,6 +283,7 @@ export function FinanceTable({ title, scope, id, dir, counterpartyLabel, tone, y
             {total.toLocaleString("pt-BR")} {total === 1 ? "registro" : "registros"}
           </div>
           <div className="table-wrap">
+            <TableTools filename="financas" />
             <div className="overflow-x-auto">
               <table className="table min-w-[680px]">
                 <thead>

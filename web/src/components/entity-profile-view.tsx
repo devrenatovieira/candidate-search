@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { EntityProfile } from "@/lib/queries";
 import { getCompanyEarmarks } from "@/lib/queries";
 import { SourceZone } from "@/components/source-zone";
+import { CopyValue, EntityActions } from "@/components/actions/entity-actions";
 import { FinanceTable } from "@/components/finance-table";
 import { PageHeader } from "@/components/shell/shell-context";
 import { YearSelect } from "@/components/ui/year-select";
@@ -40,8 +41,9 @@ export function EntityProfileView({
 
       <header className="border-b border-[var(--border-1)] pb-8">
         <div className="label">{isCompany ? "ficha de CNPJ" : "ficha de CPF"}</div>
-        <h1 className="num mt-3 text-[28px] leading-tight font-medium tracking-tight sm:text-[34px]">
+        <h1 className="num mt-3 flex items-center gap-2 text-[28px] leading-tight font-medium tracking-tight sm:text-[34px]">
           {formattedId}
+          <CopyValue value={cpfCnpj} label={isCompany ? "CNPJ" : "CPF"} />
         </h1>
         {displayName ? (
           <div className="mt-2 text-[15px]" style={{ color: "var(--muted)" }}>{displayName}</div>
@@ -64,6 +66,9 @@ export function EntityProfileView({
             </Link>
           ) : null}
         </div>
+        <EntityActions
+          entity={{ href: basePath, label: displayName ?? formattedId, sub: isCompany ? `CNPJ ${formattedId}` : `CPF ${formattedId}` }}
+        />
       </header>
 
       {registry ? (

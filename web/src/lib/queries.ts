@@ -1,4 +1,5 @@
 import { db, hasTable } from "./db";
+import { memo } from "./memo";
 import { digitsOnly, normalizeName } from "./normalize";
 
 export type Provenance = {
@@ -922,7 +923,7 @@ export type AssetsRankingRow = {
 
 export type AssetsRankingPage = { rows: AssetsRankingRow[]; total: number };
 
-export function getAssetsRanking(opts: {
+function getAssetsRankingUncached(opts: {
   year?: number;
   order?: "asc" | "desc";
   limit?: number;
@@ -997,6 +998,8 @@ export function getAssetsRanking(opts: {
   };
 }
 
+export const getAssetsRanking = memo(getAssetsRankingUncached);
+
 export type AssetsGrowthRow = {
   personId: number;
   name: string | null;
@@ -1015,7 +1018,7 @@ export type AssetsGrowthRow = {
 
 export type AssetsGrowthPage = { rows: AssetsGrowthRow[]; total: number };
 
-export function getAssetsGrowthRanking(opts: {
+function getAssetsGrowthRankingUncached(opts: {
   order?: "asc" | "desc";
   limit?: number;
   offset?: number;
@@ -1098,7 +1101,9 @@ export function getAssetsGrowthRanking(opts: {
   };
 }
 
-export function getTopSuppliers(year: number | null, limit = 10): TopSupplier[] {
+export const getAssetsGrowthRanking = memo(getAssetsGrowthRankingUncached);
+
+function getTopSuppliersUncached(year: number | null, limit = 10): TopSupplier[] {
   const sql = `
     SELECT
       supplier_cpf_cnpj AS cnpj,
@@ -1123,6 +1128,8 @@ export function getTopSuppliers(year: number | null, limit = 10): TopSupplier[] 
     candidacyCount: r.candidacyCount as number,
   }));
 }
+
+export const getTopSuppliers = memo(getTopSuppliersUncached);
 
 export type EntitySanction = {
   id: number;

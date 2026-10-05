@@ -1,16 +1,55 @@
-# Candidate Search
-DB consolidada de candidatos brasileiros (2014 a 2026), construída **exclusivamente** a partir de fontes oficiais e cruzada por CPF e CNPJ. 
+<p align="center">
+  <img src="web/src/app/icon.svg" width="72" height="72" alt="Logo do Candidate Search: lupa com um sinal de visto" />
+</p>
 
+<h1 align="center">Candidate Search</h1>
 
-<img width="1174" height="517" alt="image" src="https://github.com/user-attachments/assets/6a760c7a-16ae-4e0d-b2c4-e6ada9031b98" />
+<p align="center">
+  Ficha pública de qualquer candidato brasileiro (2014–2026), montada <strong>exclusivamente</strong> a partir de fontes oficiais e cruzada por CPF e CNPJ — com a origem de cada número exposta.
+</p>
+
+![Página inicial do Candidate Search](docs/screenshots/home.png)
 
 O objetivo é apoiar a investigação de relações entre agentes políticos e identificar indícios de padrões atípicos, como doações circulares, fracionamento de doações, empresas de fachada e evolução patrimonial incompatível.
 
-
 > **Aviso.** Os resultados do Candidate Search são indícios, não provas, e não constituem acusação contra nenhuma pessoa. O sistema produz sinais de alerta destinados à verificação por órgãos competentes (Ministério Público, TCU, Receita Federal, COAF). Cada dado exibido indica o arquivo público de origem, que pode ser baixado novamente e conferido por hash.
 
+## Funcionalidades
+
+| | |
+|---|---|
+| **Busca instantânea (Ctrl K)** | Nome ou CPF de candidato, doador ou fornecedor. Navegação por teclado (↑ ↓ Enter) e histórico de buscas recentes. |
+| **Ficha do candidato** | Candidaturas por eleição, doações recebidas, despesas contratadas e pagas, bens declarados, redes sociais, emendas, rede de doação e sinais de alerta. |
+| **Ver fontes** | Modo análise: passe o mouse sobre qualquer dado e clique para ver órgão, arquivo, URL, data de coleta e SHA-256 de onde ele saiu. |
+| **Favoritos** | ⭐ em qualquer ficha (candidato, CPF ou CNPJ); a lista fica fixada na barra lateral. |
+| **Comparar candidatos** | Até 3 candidatos lado a lado: candidaturas, doações, fundo eleitoral, despesas, patrimônio e sinais. Link compartilhável. |
+| **Exportar CSV** | Toda tabela exporta as linhas exibidas, com separador `;` e UTF-8 (abre direto no Excel). |
+| **Compartilhar e imprimir** | Copiar CPF/CNPJ com um clique, compartilhar o link da ficha e imprimir/salvar em PDF com layout próprio de impressão. |
+| **Sinais de alerta** | Doação circular, despesa desproporcional, sócio de fornecedor, análise por IA e discurso em rede social. |
+| **Grafo de correlações** | Rede interativa entre candidatos, doadores, fornecedores e empresas sancionadas. |
+| **Tema claro e escuro, mobile** | Interface responsiva com menu lateral no celular; respeita a preferência de “reduzir movimento”. |
+
+## Telas
+
+| Ficha do candidato | Comparação lado a lado |
+|---|---|
+| ![Ficha do candidato com ações de favoritar, comparar, compartilhar e imprimir](docs/screenshots/ficha-candidato.png) | ![Comparação de dois candidatos com barras proporcionais](docs/screenshots/comparar.png) |
+| **Busca (Ctrl K)** | **Ver fontes: proveniência de cada dado** |
+| ![Paleta de busca com resultados](docs/screenshots/busca.png) | ![Modal de proveniência com órgão, URL e SHA-256](docs/screenshots/proveniencia.png) |
+| **Sinal: doação circular** | **Sinal: despesa desproporcional** |
+| ![Lista de ciclos de doação](docs/screenshots/sinais-doacao-circular.png) | ![Tabela de gastos por categoria](docs/screenshots/sinais-despesa.png) |
+| **Ranking de bens declarados (com exportação CSV)** | **Tema escuro** |
+| ![Ranking de patrimônio declarado](docs/screenshots/ranking.png) | ![Página inicial no tema escuro](docs/screenshots/home-escuro.png) |
+
+<p align="center">
+  <img src="docs/screenshots/mobile.png" width="260" alt="Página inicial no celular" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/mobile-menu.png" width="260" alt="Menu lateral aberto no celular" />
+</p>
+
 ## Visão geral
-- **Backend:** pipeline de coleta em Python, com armazenamento em SQLite (`candidate_search.db`).
+
+- **Backend:** pipeline de coleta em Python (`candidate_search/`), com armazenamento em SQLite (`candidate_search.db`).
 - **Frontend:** aplicação Next.js somente leitura, em `/web`, que permite buscar candidatos e consultar a ficha completa com a fonte de cada campo.
 
 ## Uso com o banco pré-construído
@@ -30,12 +69,11 @@ A forma mais rápida de utilizar o projeto é baixar o banco já populado e exec
 | Sanções federais (CEIS/CNEP) | 25,5 mil, das quais 474 empresas aparecem como doadoras ou fornecedoras de campanha |
 | Bens declarados no registro de candidatura | 3,25 milhões, totalizando R$ 445,5 bilhões |
 
-Tamanho do banco: aproximadamente 11,4 GB.
-
+Tamanho do banco: aproximadamente 12,2 GB.
 
 ### 1. Download
 
-O arquivo `elosys.zip` tem 2,84 GB compactado (cerca de 11,4 GB após a extração). Os dois endereços abaixo disponibilizam o mesmo arquivo:
+O arquivo `elosys.zip` tem 2,84 GB compactado (cerca de 12,2 GB após a extração). Os dois endereços abaixo disponibilizam o mesmo arquivo:
 
 | Origem | Endereço |
 |---|---|
@@ -77,7 +115,7 @@ cd candidate-search
 
 cd web
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # desenvolvimento: http://localhost:3000
 ```
 
 A aplicação abre o banco em modo somente leitura e não realiza nenhuma escrita. Para utilizar outro caminho:
@@ -86,11 +124,31 @@ A aplicação abre o banco em modo somente leitura e não realiza nenhuma escrit
 CANDIDATE_SEARCH_DB_PATH=/caminho/para/candidate_search.db npm run dev
 ```
 
-Build de produção:
+### 3. Disponibilizar na rede local
+
+Para que outras pessoas da mesma rede acessem, use o modo de produção (bem mais rápido que o `dev`):
 
 ```bash
-npm run build && npm run start
+cd web
+npm run build
+npm run start:lan     # escuta em 0.0.0.0:3000
+npm run warmup        # em outro terminal: pré-carrega as consultas pesadas (~1 min)
 ```
+
+Os demais computadores acessam por `http://<IP-desta-máquina>:3000` (descubra o IP com `hostname -I` no Linux ou `ipconfig` no Windows). Se o firewall estiver ativo, libere a porta: `sudo ufw allow 3000/tcp`.
+
+As agregações mais pesadas (ranking de bens e maiores fornecedores de todos os anos) ficam em cache na memória do servidor depois do primeiro acesso, por isso o `warmup` é recomendado logo após iniciar. Ao trocar o arquivo do banco, reinicie o servidor.
+
+### Scripts do frontend (`web/`)
+
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento com recarga automática |
+| `npm run build` | Build de produção |
+| `npm run start` | Servidor de produção (localhost) |
+| `npm run start:lan` | Servidor de produção acessível pela rede (`0.0.0.0:3000`) |
+| `npm run warmup` | Pré-carrega o cache das consultas pesadas (`BASE_URL` opcional) |
+| `npm run lint` | ESLint |
 
 ## Construção do banco a partir das fontes
 
@@ -287,4 +345,8 @@ Todas as fontes são oficiais e públicas.
 - Todas as fontes utilizadas são públicas por determinação legal ou judicial.
 - O CPF de candidatos foi publicado de forma mascarada em 2024, por decisão do TSE fundamentada na LGPD, e voltou a ser divulgado integralmente em 2026. Os dados de 2024 são reconciliados pelo título eleitoral (ver `ADs/identidade.md`).
 - Os resultados constituem indícios, não provas. O sistema gera sinais de alerta, e nenhum deles deve ser tratado como acusação pública sem apuração formal pelos órgãos competentes.
+
+## Autor
+
+Mantido por **Renato Vieira** ([@devrenatovieira](https://github.com/devrenatovieira)).
 

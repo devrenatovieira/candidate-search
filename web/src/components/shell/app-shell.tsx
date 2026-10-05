@@ -1,22 +1,29 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import type { SidebarCounts } from "@/lib/stats";
+import { ToastProvider } from "@/components/ui/toast";
 import { ShellProvider } from "./shell-context";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import { NavigationProgress } from "./navigation-progress";
 
 export function AppShell({ counts, children }: { counts: SidebarCounts; children: ReactNode }) {
   return (
     <ShellProvider>
-      <div className="shell-layout">
-        <Sidebar counts={counts} />
-        <div className="shell-main">
-          <Topbar />
-          <ContentBody>{children}</ContentBody>
+      <ToastProvider>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
+        <div className="shell-layout">
+          <Sidebar counts={counts} />
+          <div className="shell-main">
+            <Topbar />
+            <ContentBody>{children}</ContentBody>
+          </div>
         </div>
-      </div>
+      </ToastProvider>
     </ShellProvider>
   );
 }

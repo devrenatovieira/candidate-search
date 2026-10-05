@@ -5,7 +5,8 @@ import { PageHeader } from "@/components/shell/shell-context";
 import { YearSelect } from "@/components/ui/year-select";
 import { getHomeStats } from "@/lib/stats";
 import { getExpenseYears } from "@/lib/queries";
-import { formatBRL, formatBRLCompact } from "@/lib/format";
+import type { ReactNode } from "react";
+import { CountUp } from "@/components/ui/count-up";
 
 export const dynamic = "force-dynamic";
 
@@ -17,22 +18,14 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
   const stats = getHomeStats(year);
 
-  const heroStats = [
-    { label: "pessoas", value: stats.people.toLocaleString("pt-BR") },
-    { label: "candidaturas", value: stats.candidacies.toLocaleString("pt-BR") },
-    {
-      label: "doações recebidas",
-      value: formatBRLCompact(stats.donationsTotalCents),
-      exact: formatBRL(stats.donationsTotalCents),
-      tone: "green" as const,
-    },
-    {
-      label: "despesas contratadas",
-      value: formatBRLCompact(stats.expensesTotalCents),
-      exact: formatBRL(stats.expensesTotalCents),
-    },
+  const heroStats: Array<{ label: string; value: ReactNode; tone?: "green" }> = [
+    { label: "pessoas", value: <CountUp value={stats.people} /> },
+    { label: "candidaturas", value: <CountUp value={stats.candidacies} /> },
+    { label: "doações recebidas", value: <CountUp value={stats.donationsTotalCents} format="brl-compact" />, tone: "green" },
+    { label: "despesas contratadas", value: <CountUp value={stats.expensesTotalCents} format="brl-compact" /> },
     { label: year ? "eleição" : "período coberto", value: stats.years },
   ];
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -68,12 +61,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           {heroStats.map((s) => (
             <div key={s.label} className="kpi">
               <div className="kpi__label">{s.label}</div>
-              <div
-                className={`kpi__value${"tone" in s && s.tone === "green" ? " kpi__value--green" : ""}`}
-                title={"exact" in s ? s.exact : undefined}
-              >
-                {s.value}
-              </div>
+              <div className={`kpi__value${s.tone === "green" ? " kpi__value--green" : ""}`}>{s.value}</div>
             </div>
           ))}
         </div>

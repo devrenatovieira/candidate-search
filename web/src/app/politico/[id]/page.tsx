@@ -8,6 +8,8 @@ import {
   getPersonPhotoUrl, getPersonPhotoProvenance, getPersonEarmarks,
 } from "@/lib/queries";
 import { SourceZone } from "@/components/source-zone";
+import { CopyValue, EntityActions } from "@/components/actions/entity-actions";
+import { CountUp } from "@/components/ui/count-up";
 import { PoliticianNetwork } from "@/components/politician-network";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { CycleGraph } from "@/components/graph/cycle-graph";
@@ -43,6 +45,11 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
   const displayName = person.canonicalName ?? "(nome indisponível)";
   const photoUrl = getPersonPhotoUrl(personId);
   const photoProvenance = photoUrl ? getPersonPhotoProvenance(personId) : null;
+  const entitySub = latestCandidacy
+    ? [latestCandidacy.office, [latestCandidacy.partyAbbr, latestCandidacy.state].filter(Boolean).join("/"), latestCandidacy.year]
+        .filter(Boolean)
+        .join(" · ")
+    : "candidato";
 
   return (
       <main className="mx-auto w-full max-w-4xl pt-8">
@@ -56,7 +63,7 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
           <div className="flex items-center gap-4">
             {photoUrl ? (
               <SourceZone provenance={photoProvenance} inline>
-                <ProfilePhoto url={photoUrl} size={72} />
+                <ProfilePhoto url={photoUrl} size={72} name={displayName} />
               </SourceZone>
             ) : null}
             <SourceZone provenance={header.provenance}>
@@ -74,11 +81,17 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
             </SourceZone>
           ) : null}
 
+          <EntityActions
+            entity={{ href: `/politico/${person.id}`, label: displayName, sub: entitySub }}
+            comparable
+          />
+
           <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3 font-mono text-[11px] text-[var(--muted)]">
             <SourceZone provenance={header.provenance} inline>
               <span>
                 <span className="text-[var(--muted-2)]">CPF </span>
                 {formatCpf(person.cpf)}
+                {person.cpf ? <CopyValue value={person.cpf} label="CPF" /> : null}
                 {person.cpf && !person.cpfTrusted ? (
                   <span className="ml-1.5 text-brand">reconciliado</span>
                 ) : null}
@@ -88,6 +101,7 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
               <span>
                 <span className="text-[var(--muted-2)]">título eleitoral </span>
                 {person.voterId ?? "não disponível"}
+                {person.voterId ? <CopyValue value={person.voterId} label="título eleitoral" /> : null}
               </span>
             </SourceZone>
           </div>
@@ -96,17 +110,17 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
             <div className="kpis mt-6">
               <div className="kpi">
                 <div className="kpi__label">recebido em doações {year ? `em ${year}` : "(todas as eleições)"}</div>
-                <div className="kpi__value kpi__value--green">{formatBRL(overviewFinance.donationsTotalCents)}</div>
+                <div className="kpi__value kpi__value--green"><CountUp value={overviewFinance.donationsTotalCents} format="brl" /></div>
                 <div className="kpi__sub">{overviewFinance.donationsCount.toLocaleString("pt-BR")} doações</div>
               </div>
               <div className="kpi">
                 <div className="kpi__label">despesas contratadas</div>
-                <div className="kpi__value">{formatBRL(overviewFinance.expensesTotalCents)}</div>
+                <div className="kpi__value"><CountUp value={overviewFinance.expensesTotalCents} format="brl" /></div>
                 <div className="kpi__sub">{overviewFinance.expensesCount.toLocaleString("pt-BR")} despesas</div>
               </div>
               <div className="kpi">
                 <div className="kpi__label">pago até agora</div>
-                <div className="kpi__value">{formatBRL(overviewFinance.paymentsTotalCents)}</div>
+                <div className="kpi__value"><CountUp value={overviewFinance.paymentsTotalCents} format="brl" /></div>
                 <div className="kpi__sub">regime de caixa</div>
               </div>
             </div>

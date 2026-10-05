@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useProgressRouter } from "@/components/shell/navigation-progress";
 
 export function YearSelect({
   basePath, years, value, allLabel = "todos",
@@ -10,7 +10,7 @@ export function YearSelect({
   value?: number;
   allLabel?: string;
 }) {
-  const router = useRouter();
+  const router = useProgressRouter();
   if (years.length === 0) return null;
 
   return (

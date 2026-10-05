@@ -3,7 +3,7 @@
 import "@xyflow/react/dist/style.css";
 import { useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useProgressRouter } from "@/components/shell/navigation-progress";
 import {
   MarkerType,
   ReactFlow,
@@ -90,7 +90,7 @@ export function CycleGraph({
 function Ring({
   nodes: cycleNodes, selfCpfCnpj, edgeAmounts,
 }: { nodes: CycleNode[]; selfCpfCnpj: string | null; edgeAmounts: number[] }) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const colorMode = useColorMode();
   const n = cycleNodes.length;
   const radius = n === 2 ? 130 : n <= 3 ? 90 : n <= 5 ? RING_R : 92 + (n - 5) * 14;

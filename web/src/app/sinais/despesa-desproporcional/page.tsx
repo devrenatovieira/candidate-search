@@ -10,6 +10,7 @@ import { ExpenseCategorySelect } from "@/components/ui/expense-category-select";
 import { PaginationLinks } from "@/components/ui/pagination-links";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CategoryExpenseRow } from "@/components/category-expense-row";
+import { TableTools } from "@/components/actions/table-tools";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,7 @@ export default async function DespesaDesproporcionalPage({
           <EmptyState icon="◌" title={`ninguém gastou em ${categoryLabel} em ${yearLabel}.`} />
         ) : (
           <div className="table-wrap">
+            <TableTools filename="despesa-desproporcional" />
             <div className="overflow-x-auto">
               <table className="table min-w-[820px]">
                 <thead>

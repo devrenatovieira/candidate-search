@@ -2,7 +2,7 @@
 
 import "@xyflow/react/dist/style.css";
 import { useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useProgressRouter } from "@/components/shell/navigation-progress";
 import {
   Background,
   Controls,
@@ -109,7 +109,7 @@ function layoutSide(
 function Inner({
   network, centerLabel, centerPhotoUrl,
 }: { network: PoliticianDonationNetwork; centerLabel: string; centerPhotoUrl: string | null }) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const { donatedTo, receivedFrom } = network;
 
   const { nodes, edges, height } = useMemo(() => {
