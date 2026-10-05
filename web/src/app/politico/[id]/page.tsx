@@ -80,7 +80,7 @@ export default async function PoliticoPage({ params, searchParams }: PageProps<"
                 <span className="text-[var(--muted-2)]">CPF </span>
                 {formatCpf(person.cpf)}
                 {person.cpf && !person.cpfTrusted ? (
-                  <span className="ml-1.5 text-elo-amber">reconciliado</span>
+                  <span className="ml-1.5 text-brand">reconciliado</span>
                 ) : null}
               </span>
             </SourceZone>
@@ -167,7 +167,7 @@ async function SignalsSection({ personId, personCpf }: { personId: number; perso
   return (
     <section id="sinais" data-toc-title="sinais de alerta" className="animate-in py-7">
       <div className="mb-2 flex items-baseline gap-3">
-        <div className="section-title !text-elo-red">sinais de alerta</div>
+        <div className="section-title !text-signal-red">sinais de alerta</div>
         <span className="font-mono text-[9px] text-[var(--muted-2)]">
           {signalsCount} {signalsCount === 1 ? "sinal" : "sinais"}
           {signalsCount > signals.length ? ` · mostrando os ${signals.length} maiores` : ""}
@@ -265,7 +265,7 @@ async function CandidaciesSection({ personId }: { personId: number }) {
         {candidacies.map((c) => {
           const tone = resultTone(c.result);
           const toneColor =
-            tone === "green" ? "text-elo-green" : tone === "red" ? "text-elo-red" : "text-[var(--muted)]";
+            tone === "green" ? "text-signal-green" : tone === "red" ? "text-signal-red" : "text-[var(--muted)]";
           const cnpj = cnpjByYear.get(c.year);
           return (
             <SourceZone key={c.id} provenance={c.provenance}>
@@ -488,7 +488,7 @@ function NetworkSkeleton() {
 function SignalsSkeleton() {
   return (
     <section id="sinais" data-toc-title="sinais de alerta" className="py-7">
-      <div className="section-title mb-4 !text-elo-red">sinais de alerta</div>
+      <div className="section-title mb-4 !text-signal-red">sinais de alerta</div>
       <div className="flex flex-col gap-2">
         {Array.from({ length: 2 }).map((_, i) => (
           <div key={i} className="signal signal--medium">

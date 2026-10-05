@@ -1,4 +1,4 @@
-# Como o EloSys funciona — visão geral técnica aprofundada
+# Como o Candidate Search funciona — visão geral técnica aprofundada
 
 > Este documento existe pra explicar o projeto inteiro pra alguém que nunca viu o
 > código: o que ele faz, de onde vem cada dado, como cada algoritmo de detecção
@@ -12,7 +12,7 @@
 
 ## Sumário
 
-1. [O que é o EloSys](#1-o-que-é-o-elosys)
+1. [O que é o Candidate Search](#1-o-que-é-o-candidate-search)
 2. [As duas metades do projeto](#2-as-duas-metades-do-projeto)
 3. [O princípio central: rewrite-only + prova pública](#3-o-princípio-central-rewrite-only--prova-pública)
 4. [A cadeia de proveniência](#4-a-cadeia-de-proveniência-de-onde-vem-cada-campo)
@@ -27,7 +27,7 @@
 
 ---
 
-## 1. O que é o EloSys
+## 1. O que é o Candidate Search
 
 Um cruzamento de **dados públicos brasileiros** (TSE, Receita Federal, Portal da
 Transparência, redes sociais que o próprio candidato declarou à Justiça
@@ -46,18 +46,18 @@ parecidos não tem:
 ## 2. As duas metades do projeto
 
 ```
-┌─────────────────────────┐        ┌──────────────────────────┐
-│   elosys/  (Python)      │  ───▶  │   elosys.db (SQLite)      │  ───▶  web/ (Next.js)
-│   coletores + regras     │        │   um arquivo só            │        lê, nunca escreve
-└─────────────────────────┘        └──────────────────────────┘
+┌────────────────────────────┐        ┌──────────────────────────────┐
+│ candidate_search/ (Python) │  ───▶  │ candidate_search.db (SQLite) │  ───▶  web/ (Next.js)
+│ coletores + regras         │        │ um arquivo só                │        lê, nunca escreve
+└────────────────────────────┘        └──────────────────────────────┘
 ```
 
-- **`elosys/`** (Python) — um conjunto de **coletores independentes**
-  (`elosys/tse/*.py`, `elosys/receita/cnpj.py`, `elosys/transparencia/sanctions.py`,
-  `elosys/social/*.py`) e **regras de detecção** (`elosys/rules/*.py`) que juntos
-  constroem o banco do zero a cada rodada. Cada um roda via `elosys <comando>`
-  (ver `elosys/cli.py`).
-- **`elosys.db`** — um único arquivo SQLite. É um *artefato de build*: não é
+- **`candidate_search/`** (Python) — um conjunto de **coletores independentes**
+  (`candidate_search/tse/*.py`, `candidate_search/receita/cnpj.py`, `candidate_search/transparencia/sanctions.py`,
+  `candidate_search/social/*.py`) e **regras de detecção** (`candidate_search/rules/*.py`) que juntos
+  constroem o banco do zero a cada rodada. Cada um roda via `candidate-search <comando>`
+  (ver `candidate_search/cli.py`).
+- **`candidate_search.db`** — um único arquivo SQLite. É um *artefato de build*: não é
   editado à mão, não guarda histórico de versões — cada rodada dos coletores o
   reconstrói (ver §3).
 - **`web/`** (Next.js/React) — a aplicação que as pessoas realmente usam. Ela
@@ -72,7 +72,7 @@ A decisão mais importante do projeto (documentada em `ADs/imutabilidade.md`) é
 que o banco **não é editado incrementalmente**. Cada coletor:
 
 1. Apaga só as tabelas que ele mesmo é dono (`reset_source()` em
-   `elosys/provenance.py`) — nunca mexe no que outro coletor gerou.
+   `candidate_search/provenance.py`) — nunca mexe no que outro coletor gerou.
 2. Baixa os arquivos oficiais de novo.
 3. Reconstrói suas tabelas do zero.
 
@@ -93,9 +93,9 @@ não dentro do banco:
   ano, quantos CPFs foram descartados por ambiguidade (e por quê), quantas
   colisões foram puladas.
 
-O comando `elosys verify` **rebaixa cada URL do manifesto e confere o hash**.
+O comando `candidate-search verify` **rebaixa cada URL do manifesto e confere o hash**.
 Se bater tudo, o banco inteiro é reproduzível a partir de fontes públicas — sem
-confiar em nada que o EloSys "disse" sobre si mesmo.
+confiar em nada que o Candidate Search "disse" sobre si mesmo.
 
 ## 4. A cadeia de proveniência (de onde vem cada campo)
 
@@ -131,7 +131,7 @@ Duas pessoas com o mesmo nome não são a mesma pessoa; a mesma pessoa em
 eleições diferentes pode aparecer com CPF mascarado num ano e CPF completo no
 outro (o TSE mascarou o CPF em 2024 por LGPD e reverteu em 2026). A tabela
 `people` existe pra resolver isso, com uma ordem de match **determinística**
-(`elosys/identity.py`, função `resolve_person`):
+(`candidate_search/identity.py`, função `resolve_person`):
 
 1. Se o **título de eleitor** já existe em algum `people`, usa essa pessoa.
 2. Senão, se o **CPF** é válido (dígito verificador correto) e já existe em
@@ -143,7 +143,7 @@ dado novo **só preenche o que tava faltando** — nunca sobrescreve um valor j�
 existente. É assim que uma candidatura de 2024 (só com título, CPF mascarado)
 "herda" o CPF que aparece no arquivo de 2026 da mesma pessoa.
 
-Antes disso, `elosys/tse/candidates.py` já descartou CPFs ambíguos: um CPF é
+Antes disso, `candidate_search/tse/candidates.py` já descartou CPFs ambíguos: um CPF é
 jogado fora (e registrado em `rejected_cpf`, com o motivo) se ele está ligado a
 **mais de um título de eleitor diferente**, ou se o título dele também aparece
 ligado a **outro CPF diferente** — sinal de erro de digitação em algum lugar.
@@ -167,14 +167,14 @@ doação/despesa. Só uma pessoa que realmente concorreu a cargo eletivo entra e
 
 | Coletor | Fonte oficial | O que vira | Chave de identidade |
 |---|---|---|---|
-| `elosys/tse/candidates.py` | `consulta_cand_{ano}.zip`, CDN do TSE | `politician_history` (uma linha por candidatura/ano) | título eleitoral → CPF (ver §5) |
-| `elosys/tse/accounts.py` | `prestacao_de_contas_eleitorais_candidatos_{ano}.zip` (3 CSVs: receitas, despesas contratadas, despesas pagas) | `campaign_org`, `campaign_donation`, `campaign_expense`, `campaign_expense_payment` | doador/fornecedor só vira `people` se já for candidato conhecido |
-| `elosys/tse/assets.py` | `bem_candidato_{ano}.zip` | `declared_assets` (um bem por linha, nominal, sem correção de inflação) | via `SQ_CANDIDATO` |
-| `elosys/tse/social.py` | `rede_social_candidato_{ano}.zip` | `social_media` (handles **declarados** ao TSE, obrigatório desde a Res. 23.610/2019) | via `SQ_CANDIDATO` |
-| `elosys/tse/photo_urls.py` | API de busca por CPF do DivulgaCandContas (`pesquisar?cpf=...`) | `candidate_photo` (só a **URL** da foto oficial, nunca a imagem) | busca exata por CPF — sem risco de homônimo |
-| `elosys/receita/cnpj.py` | BrasilAPI (proxy da Receita Federal) | `company_registry`, `company_partner` (quadro societário) | por CNPJ; sócio pessoa física vem com CPF **mascarado** pela própria fonte |
-| `elosys/transparencia/sanctions.py` | Portal da Transparência — CEIS + CNEP (snapshot do dia, sem histórico por ano) | `sanction` | por CPF/CNPJ; nunca cria `people` novo, só liga a quem já existe |
-| `elosys/social/x_posts.py` + `apify.py` | X/Twitter, via Apify, só das contas **declaradas ao TSE** | `social_account`, `social_post` | nunca "adivinha" um handle |
+| `candidate_search/tse/candidates.py` | `consulta_cand_{ano}.zip`, CDN do TSE | `politician_history` (uma linha por candidatura/ano) | título eleitoral → CPF (ver §5) |
+| `candidate_search/tse/accounts.py` | `prestacao_de_contas_eleitorais_candidatos_{ano}.zip` (3 CSVs: receitas, despesas contratadas, despesas pagas) | `campaign_org`, `campaign_donation`, `campaign_expense`, `campaign_expense_payment` | doador/fornecedor só vira `people` se já for candidato conhecido |
+| `candidate_search/tse/assets.py` | `bem_candidato_{ano}.zip` | `declared_assets` (um bem por linha, nominal, sem correção de inflação) | via `SQ_CANDIDATO` |
+| `candidate_search/tse/social.py` | `rede_social_candidato_{ano}.zip` | `social_media` (handles **declarados** ao TSE, obrigatório desde a Res. 23.610/2019) | via `SQ_CANDIDATO` |
+| `candidate_search/tse/photo_urls.py` | API de busca por CPF do DivulgaCandContas (`pesquisar?cpf=...`) | `candidate_photo` (só a **URL** da foto oficial, nunca a imagem) | busca exata por CPF — sem risco de homônimo |
+| `candidate_search/receita/cnpj.py` | BrasilAPI (proxy da Receita Federal) | `company_registry`, `company_partner` (quadro societário) | por CNPJ; sócio pessoa física vem com CPF **mascarado** pela própria fonte |
+| `candidate_search/transparencia/sanctions.py` | Portal da Transparência — CEIS + CNEP (snapshot do dia, sem histórico por ano) | `sanction` | por CPF/CNPJ; nunca cria `people` novo, só liga a quem já existe |
+| `candidate_search/social/x_posts.py` + `apify.py` | X/Twitter, via Apify, só das contas **declaradas ao TSE** | `social_account`, `social_post` | nunca "adivinha" um handle |
 
 Pontos que valem destacar:
 
@@ -191,7 +191,7 @@ Pontos que valem destacar:
   dela. É também o único coletor **incremental** (não rewrite-only) além do
   `receita/cnpj.py` — ver a nota de "arquivamento seletivo" abaixo.
 - `social/x_posts.py` é a única parte do sistema que **não** passa por
-  `manifest.json`/`elosys verify` — um post pode ser apagado a qualquer
+  `manifest.json`/`candidate-search verify` — um post pode ser apagado a qualquer
   momento, então a prova de integridade fica junto do próprio registro
   (`raw_json` + `raw_sha256` + `retrieved_at`), não num arquivo externo.
 
@@ -208,7 +208,7 @@ a qualquer momento pra completar mais um pedaço do catálogo.
 
 ## 7. Os algoritmos de detecção, um por um
 
-Todos os três moram em `elosys/rules/` e escrevem nas mesmas 4 tabelas
+Todos os três moram em `candidate_search/rules/` e escrevem nas mesmas 4 tabelas
 genéricas (`rule_run`, `signal`, `signal_actor`, `signal_evidence` — ver §9).
 Nenhum deles é rewrite-only incremental: cada rodada apaga só os sinais **daquela
 regra** e recalcula do zero a partir do estado atual das tabelas-fonte.
@@ -245,7 +245,7 @@ aresta só do tipo `"both"`, com o valor somado das duas.
    técnica que garante achar cada ciclo simples **exatamente uma vez**, nunca
    duplicado.
 
-**Os números exatos que controlam isso** (`elosys rule-circular-donations
+**Os números exatos que controlam isso** (`candidate-search rule-circular-donations
 --max-depth N --max-fanout N`):
 
 - `max_depth = 5` — o ciclo mais longo que a busca considera (5 arestas). Sem
@@ -358,7 +358,7 @@ irregularidade."**
 ### 8.2 `social_review.py` — triagem de discurso em redes sociais
 
 Mesmo princípio, aplicado aos posts que bateram no léxico de termos
-potencialmente ofensivos (`elosys/social/lexicon.py` — **~470 termos** em 15
+potencialmente ofensivos (`candidate_search/social/lexicon.py` — **~470 termos** em 15
 categorias: racismo, LGBTfobia, misoginia, xenofobia, capacitismo,
 antissemitismo, etc., cada termo com peso `alta/média/baixa` conforme o quanto
 depende de contexto). O léxico é descrito no próprio código como **um filtro de
@@ -424,12 +424,12 @@ Next.js (App Router), Server Components por padrão. Estrutura:
 Isso é o ponto central do projeto, então vale repetir de forma direta:
 
 ```bash
-elosys verify --db elosys.db
+candidate-search verify --db candidate_search.db
 ```
 
 Esse comando **rebaixa cada URL registrada no `manifest.json`** e compara o
 hash com o que foi salvo na hora do build original. Se todos baterem, você
-provou, sem confiar em nada que o EloSys "disse" — só olhando pros arquivos
+provou, sem confiar em nada que o Candidate Search "disse" — só olhando pros arquivos
 públicos do TSE/Receita/Portal da Transparência — que o banco inteiro é
 reconstruível a partir de fontes oficiais.
 
@@ -442,7 +442,7 @@ Outras formas de conferir:
   rejeitados, por quê) sem rodar nada.
 - **Reconstruir do zero**: como o build é rewrite-only, rodar os coletores de
   novo numa máquina limpa reproduz o mesmo banco (a menos que a fonte
-  original tenha mudado de valor — o que o `elosys verify` também detecta,
+  original tenha mudado de valor — o que o `candidate-search verify` também detecta,
   como uma divergência de hash).
 - **Os algoritmos de detecção são código aberto, sem caixa-preta**: os
   thresholds exatos (R$ 5.000, profundidade 5, etc.) estão no próprio arquivo

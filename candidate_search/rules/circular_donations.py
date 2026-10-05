@@ -12,7 +12,7 @@ from ..db import connect, create_schema
 from ..log import RowCounter, get_logger, step
 from ..util import git_commit, now_utc
 
-log = get_logger("elosys.rules.circular_donations")
+log = get_logger("candidate_search.rules.circular_donations")
 
 RULE_NAME = "circular_donations"
 RULE_VERSION = "1.1"
@@ -418,8 +418,8 @@ def _reset(con: sqlite3.Connection) -> None:
 
 
 def _main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="python -m elosys.rules.circular_donations")
-    p.add_argument("--db", default="elosys.db")
+    p = argparse.ArgumentParser(prog="python -m candidate_search.rules.circular_donations")
+    p.add_argument("--db", default="candidate_search.db")
     p.add_argument("--max-depth", type=int, default=DEFAULT_MAX_DEPTH,
                    help=f"max cycle length in hops (default: {DEFAULT_MAX_DEPTH})")
     p.add_argument("--max-fanout", type=int, default=DEFAULT_MAX_FANOUT,

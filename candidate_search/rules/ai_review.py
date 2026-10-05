@@ -10,7 +10,7 @@ from ..ai.deepseek import DEFAULT_MODEL, DeepSeekError, chat_json
 from ..log import RowCounter, get_logger, step
 from ..util import now_utc
 
-log = get_logger("elosys.rules.ai_review")
+log = get_logger("candidate_search.rules.ai_review")
 
 REVIEWABLE_RULES = ("circular_donations", "disproportionate_expense")
 DEFAULT_LIMIT = 50

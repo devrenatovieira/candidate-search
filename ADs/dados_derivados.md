@@ -62,13 +62,13 @@ As linhas em `signal_evidence` apontam para tabelas com `provenance_id` — ent�
 um sinal chega-se, por transitividade, a todas as URLs/arquivos de origem. Um sinal
 sem nenhuma linha em `signal_evidence` é inválido.
 
-O SQL real está em `elosys/schema.sql` (`rule_run`/`signal`/`signal_actor`/
+O SQL real está em `candidate_search/schema.sql` (`rule_run`/`signal`/`signal_actor`/
 `signal_evidence`) — o bloco acima é o desenho original; a única diferença é
 `signal_actor.role` como `NOT NULL` (toda linha de ator já sabe seu papel).
 
 ### 1.1. Primeira regra: `disproportionate_expense` ("despesa desproporcional")
 
-`elosys/rules/disproportionate_expense.py` — roda com `elosys
+`candidate_search/rules/disproportionate_expense.py` — roda com `candidate-search
 rule-disproportionate-expense`. v1.0, deliberadamente simples: uma lista de
 palavras-chave de item barato (caneta, adesivo, crachá...) + dois limiares de
 valor (`medium` ≥ R$ 5.000, `high` ≥ R$ 50.000) contra
@@ -83,9 +83,9 @@ tipicamente barata". Uma v2 com outlier estatístico por `DS_ORIGEM_DESPESA`
 
 ### 1.2. Segunda regra: `circular_donations` ("doação circular")
 
-`elosys/rules/circular_donations.py` — roda com `elosys
-rule-circular-donations --db elosys.db [--max-depth N] [--max-fanout N]`, ou
-direto: `python -m elosys.rules.circular_donations`. Diferente da primeira
+`candidate_search/rules/circular_donations.py` — roda com `candidate-search
+rule-circular-donations --db candidate_search.db [--max-depth N] [--max-fanout N]`, ou
+direto: `python -m candidate_search.rules.circular_donations`. Diferente da primeira
 regra (uma passada sobre uma tabela), esta constrói um grafo dirigido sobre a
 base inteira (doações: doador → candidato; despesas: candidato → fornecedor,
 resolvidos pelo CPF/CNPJ real via `campaign_org.person_id`, pulando o CNPJ de
@@ -136,7 +136,7 @@ prova" e uma checagem manual pra dizer se é notável.
 
 ### 1.3. Camada de triagem por LLM: `ai-review`
 
-`elosys/rules/ai_review.py` — roda com `elosys ai-review`, opcional, precisa
+`candidate_search/rules/ai_review.py` — roda com `candidate-search ai-review`, opcional, precisa
 de `DEEPSEEK_API_KEY` no ambiente (nunca em arquivo). 108k sinais de doação
 circular é volume demais pra um humano varrer, e a maioria "faz sentido".
 Este job passa os fatos de cada sinal (o resumo + as entidades com partido/
@@ -175,10 +175,10 @@ na ficha do candidato e na lista de doações circulares.
 Fonte diferente do resto (não é arquivo do governo): posts do X/Twitter de
 contas **declaradas pelo próprio candidato ao TSE** (`social_media`, vindo de
 `rede_social_candidato`, obrigatório desde a Res. 23.610/2019). O crawler
-`elosys/social/x_posts.py` (comando `elosys social-x`, precisa de
+`candidate_search/social/x_posts.py` (comando `candidate-search social-x`, precisa de
 `APIFY_TOKEN`) NUNCA adivinha handle — parte da URL declarada.
 
-**Léxico como filtro de recall.** `elosys/social/lexicon.py` — ~470 termos
+**Léxico como filtro de recall.** `candidate_search/social/lexicon.py` — ~470 termos
 PT-BR que PODEM ser pejorativos (homofobia, racismo, misoginia, capacitismo,
 xenofobia, regionalismo, antissemitismo, intolerância religiosa, aporofobia,
 gordofobia, etarismo, desumanização), com peso `alta`/`media`/`baixa`. A
@@ -191,12 +191,12 @@ recall**: ódio codificado sem palavra-chave nunca é coletado.
 
 **Não repúdio de conteúdo efêmero.** Um tweet pode ser apagado — não dá pra
 "re-baixar e conferir o hash" como nos arquivos do TSE. Por isso `social-x`
-NÃO entra no `manifest.json` / `elosys verify`. A âncora é o payload cru do
+NÃO entra no `manifest.json` / `candidate-search verify`. A âncora é o payload cru do
 scraper + `raw_sha256` + `retrieved_at` gravados INLINE em `social_post`,
 mais o commit do git que registrou a linha. Um tweet apagado fica no banco
 rotulado "arquivado em DD/MM/AAAA".
 
-**`social-review` (`elosys/rules/social_review.py`, precisa de
+**`social-review` (`candidate_search/rules/social_review.py`, precisa de
 `DEEPSEEK_API_KEY`).** Espelha o `ai-review`: passa o texto de cada post
 sinalizado pro LLM e pergunta se, PELO CONTEXTO, aquilo ataca um grupo
 protegido (ou é xingamento desumanizante a uma pessoa) — ou se é uso
@@ -235,7 +235,7 @@ até as fontes.
 ## Consequências
 
 - Cada regra carrega o custo de registrar execução + evidências. Padronizar numa
-  base comum (`elosys.rules`).
+  base comum (`candidate_search.rules`).
 - Recalcular tudo é sempre possível e barato de auditar.
 - Score agregado por político (se existir) é ele próprio uma regra derivada de sinais
   — mesma disciplina.

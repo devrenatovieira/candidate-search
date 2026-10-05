@@ -11,7 +11,7 @@ from contextlib import contextmanager
 _CONFIGURED = False
 
 
-def get_logger(name: str = "elosys") -> logging.Logger:
+def get_logger(name: str = "candidate_search") -> logging.Logger:
     global _CONFIGURED
     if not _CONFIGURED:
         stream = sys.stderr
@@ -24,7 +24,7 @@ def get_logger(name: str = "elosys") -> logging.Logger:
                 pass
         handler = logging.StreamHandler(stream)
         handler.setFormatter(logging.Formatter("%(asctime)s  %(name)-22s  %(message)s", "%H:%M:%S"))
-        root = logging.getLogger("elosys")
+        root = logging.getLogger("candidate_search")
         root.addHandler(handler)
         root.setLevel(logging.INFO)
         _CONFIGURED = True

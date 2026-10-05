@@ -110,7 +110,7 @@ export default async function AnaliseIaPage({ searchParams }: PageProps<"/sinais
             title="nenhuma revisão ainda"
             hint={
               <>
-                <code>elosys ai-review --db elosys.db --limit 100</code> (precisa de{" "}
+                <code>candidate-search ai-review --db candidate_search.db --limit 100</code> (precisa de{" "}
                 <code>DEEPSEEK_API_KEY</code>)
               </>
             }

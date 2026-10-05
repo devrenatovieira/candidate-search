@@ -1,8 +1,8 @@
-# EloSys — web (busca de candidatos)
+# Candidate Search — web (busca de candidatos)
 
 App Next.js, **só leitura**. Não escreve no banco, não roda os crawlers — isso é
-trabalho do pipeline Python em [`/elosys`](../README.md). Este app só abre
-`../elosys.db` (SQLite, arquivo único) e serve busca + ficha do candidato.
+trabalho do pipeline Python em [`/candidate_search`](../README.md). Este app só abre
+`../candidate_search.db` (SQLite, arquivo único) e serve busca + ficha do candidato.
 
 ## Rodando
 
@@ -11,13 +11,13 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Por padrão lê `../elosys.db` (a raiz do repo). Pra apontar outro arquivo:
+Por padrão lê `../candidate_search.db` (a raiz do repo). Pra apontar outro arquivo:
 
 ```sh
-ELOSYS_DB_PATH=/caminho/para/outro.db npm run dev
+CANDIDATE_SEARCH_DB_PATH=/caminho/para/outro.db npm run dev
 ```
 
-Se `elosys.db` não existir ainda, rode o pipeline Python primeiro (ver
+Se `candidate_search.db` não existir ainda, rode o pipeline Python primeiro (ver
 [README raiz](../README.md#rodar-com-banco-de-dados)).
 
 ## Como está organizado
@@ -90,14 +90,14 @@ Se `elosys.db` não existir ainda, rode o pipeline Python primeiro (ver
   **o mesmo nó** (`getGraphIdentity` canonicaliza tudo pro CPF) — aparece
   como a bolinha âmbar do político, com o nome dele.
 - `src/app/sinais/doacao-circular/page.tsx` — lista os sinais da regra Python
-  `elosys/rules/circular_donations.py` (ciclos de doação/despesa achados na
+  `candidate_search/rules/circular_donations.py` (ciclos de doação/despesa achados na
   base inteira, fora do web app — ver README raiz e `ADs/dados_derivados.md`),
   filtrável por severidade e **ordenável por valor movimentado ou tamanho do
   caminho** (`signal.amount_cents`/`signal.path_length`, exatos — não uma
   amostra), com link "ver no grafo" pra cada ciclo (abre
   `/grafo?add=cpf1,cpf2,...` já carregado) e, quando existe, o veredito da IA.
 - `src/app/sinais/analise-ia/page.tsx` — lista as revisões de LLM
-  (`signal_ai_review`, geradas por `elosys ai-review`): o que o modelo achou
+  (`signal_ai_review`, geradas por `candidate-search ai-review`): o que o modelo achou
   bizarro vs. plausível, com a explicação e os fatos que ele citou. Filtro
   por veredito e por regra. O veredito também aparece como selo na ficha do
   candidato e na lista de doações circulares.
@@ -109,7 +109,7 @@ Se `elosys.db` não existir ainda, rode o pipeline Python primeiro (ver
 
 ## Por que cada campo mostra a fonte
 
-Todo dado no `elosys.db` carrega `provenance_id → parse → collection → source`
+Todo dado no `candidate_search.db` carrega `provenance_id → parse → collection → source`
 (ver [`ADs/confiabilidade.md`](../ADs/confiabilidade.md)). O app só está
 expondo esse rastro que já existe no banco — não inventa nada de proveniência
 na camada web.

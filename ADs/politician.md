@@ -63,7 +63,7 @@ politician_history (
 Uma linha por candidatura por eleição/turno. Sem `raw_data`, sem `supersedes_id`:
 o build é rewrite-only (ver [imutabilidade.md](imutabilidade.md)) — erro de
 mapeamento se conserta no parser e rebuilda. O valor bruto está sempre no CSV da
-fonte (hash em `collection_file`, reproduzível via `elosys verify`).
+fonte (hash em `collection_file`, reproduzível via `candidate-search verify`).
 
 Colunas que **saíram** por virem sempre vazias nesta fase: `campaign_cnpj` e
 `photo_url` (ver §2 e §5 — entram quando os parsers dessas fontes existirem).
@@ -75,7 +75,7 @@ próprio (Receita, natureza jurídica 409-4) e ele aparece na **prestação de c
 eleitorais** do TSE (`prestacao_contas/prestacao_de_contas_eleitorais_candidatos_AAAA.zip`),
 repetido em cada linha de receita (`NR_CNPJ_PRESTADOR_CONTA` + `SQ_CANDIDATO`).
 
-Implementado em `elosys/tse/accounts.py` (crawler independente, `elosys tse-accounts`):
+Implementado em `candidate_search/tse/accounts.py` (crawler independente, `candidate-search tse-accounts`):
 varre `receitas_candidatos_AAAA_BRASIL.csv` e guarda as triplas distintas
 `(ano, SQ_CANDIDATO, CNPJ)` em `campaign_org` — **não** como coluna em
 `politician_history`. O vínculo com a pessoa é por `SQ_CANDIDATO`
@@ -155,7 +155,7 @@ RRC (Requerimento de Registro de Candidatura) — também não é coluna do
 `consulta_cand`, é arquivo próprio:
 `consulta_cand/rede_social_candidato_AAAA.zip`.
 
-Implementado em `elosys/tse/social.py` (`elosys tse-social`): varre
+Implementado em `candidate_search/tse/social.py` (`candidate-search tse-social`): varre
 `rede_social_candidato_AAAA_BRASIL.csv` (uma linha por URL declarada) e guarda em
 `social_media`, ligado por `SQ_CANDIDATO` (= `tse_candidacy_id`) direto — sem
 fallback por CPF, porque a chave já vem no arquivo. `platform` é inferido da URL
@@ -183,8 +183,8 @@ snapshot do dia atual (`download-de-dados/{ceis|cnep}/AAAAMMDD`); a data é
 descoberta lendo a própria página de download (o mesmo valor que o botão
 "Baixar" usaria), não assumida do relógio local.
 
-Implementado em `elosys/transparencia/sanctions.py`
-(`elosys transparencia-sanctions`, sem `--years`). CEIS e CNEP têm as mesmas
+Implementado em `candidate_search/transparencia/sanctions.py`
+(`candidate-search transparencia-sanctions`, sem `--years`). CEIS e CNEP têm as mesmas
 colunas exceto por `VALOR DA MULTA` (só no CNEP, inserida no meio) — o parser
 lê por **posição**, não por nome de coluna, porque os nomes de coluna
 acentuados têm risco de mojibake dependendo do terminal/pipe.
@@ -218,7 +218,7 @@ de campanha — candidato natural a virar uma segunda regra de detecção.
 arquivo único pra baixar; CNPJ da Receita é consulta individual rate-limited
 (`brasilapi.com.br/api/cnpj/v1/{cnpj}`, proxy público da Receita Federal).
 Com >1,3M CNPJs distintos em `companies`, rebaixar tudo a cada build é
-inviável. `elosys/receita/cnpj.py` (`elosys receita-cnpj`) é por isso um
+inviável. `candidate_search/receita/cnpj.py` (`candidate-search receita-cnpj`) é por isso um
 **cache incremental**: só busca CNPJ que ainda não tem linha em
 `company_registry`, então pode ser rodado várias vezes ao longo do tempo pra
 ir preenchendo o catálogo — cada linha individual continua auditável
@@ -269,7 +269,7 @@ Dataset próprio do TSE: `bem_candidato_AAAA.zip`
 tipo (imóvel, veículo, aplicação financeira, participação societária...), descrição e
 valor declarado. É a base do sinal "enriquecimento patrimonial incompatível" (README).
 
-Implementado em `elosys/tse/assets.py` (`elosys tse-assets`, 2014–2026 — mesmo
+Implementado em `candidate_search/tse/assets.py` (`candidate-search tse-assets`, 2014–2026 — mesmo
 layout com cabeçalho em todos os anos, igual `consulta_cand`). **Tabela
 separada, não coluna em `politician_history`** (relação 1:N e o valor por bem
 importa):
@@ -311,7 +311,7 @@ Observações:
   total declarado (nominal, sem deflação). Já dá pra ver outlier grosseiro
   nos dados brutos (um candidato só declarou R$ 12,1 bilhões em 2024 — quase
   certamente erro de digitação do próprio candidato/cartório, não é algo que
-  o Elosys corrige, só reporta como veio).
+  o Candidate Search corrige, só reporta como veio).
 
 ### 4. CPF mascarado de 2024 — chave de reconciliação
 
@@ -328,7 +328,7 @@ Observações:
   2024 deu); quem quer o CPF da pessoa lê `people.cpf` via `person_id`. Nada de
   editar linha ou `supersedes_id`.
 
-### 5. Foto oficial — `candidate_photo` (elosys/tse/photo_urls.py)
+### 5. Foto oficial — `candidate_photo` (candidate_search/tse/photo_urls.py)
 
 Implementado, como exceção deliberada — ver o comentário longo em schema.sql
 acima de `candidate_photo`. Curto: o Portal de Dados Abertos só tem as fotos
@@ -374,6 +374,6 @@ priorizando por ano de candidatura mais recente.
 - ⚠️ **Deflação de valores de bens** (IPCA) é decisão da regra de detecção, não do
   schema — guardamos nominal.
 - ✅ ~~Mapear a API interna do DivulgaCandContas para as fotos por ano~~ — feito em
-  `elosys/tse/photo_urls.py` (§5): busca por CPF exato, só guarda a URL (hotlink
+  `candidate_search/tse/photo_urls.py` (§5): busca por CPF exato, só guarda a URL (hotlink
   direto do CDN do TSE, sem baixar/armazenar a imagem). Rodado pra 2026: 20.762/
   20.762 pessoas, 0 erros.

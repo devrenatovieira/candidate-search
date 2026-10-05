@@ -7,7 +7,7 @@ import sqlite3
 from ..log import RowCounter, get_logger, step
 from ..util import normalize_name, now_utc
 
-log = get_logger("elosys.rules.candidate_supplier_partner")
+log = get_logger("candidate_search.rules.candidate_supplier_partner")
 
 MATCH_BASIS = "nome_e_6_digitos"
 MIN_NAME_LEN = 8

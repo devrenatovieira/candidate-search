@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from elosys.db import connect, create_schema
-from elosys.receita import cnpj as receita_cnpj
+from candidate_search.db import connect, create_schema
+from candidate_search.receita import cnpj as receita_cnpj
 
 _CNPJ_OK = "13347016000117"
 _CNPJ_404 = "00000000000000"

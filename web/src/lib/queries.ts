@@ -2554,7 +2554,7 @@ export function getDiscourseSignals(opts: {
   }));
 }
 
-// Keep in sync with CATEGORIES in elosys/rules/disproportionate_expense.py
+// Keep in sync with CATEGORIES in candidate_search/rules/disproportionate_expense.py
 const EXPENSE_CATEGORY_SPELLINGS: Record<string, string[]> = {
   CANETA: ["CANETA"],
   LAPIS: ["LAPIS", "LÁPIS"],

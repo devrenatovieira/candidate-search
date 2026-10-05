@@ -8,7 +8,7 @@ type Theme = "light" | "dark";
 function readEffectiveTheme(): Theme {
   const explicit = document.documentElement.getAttribute("data-theme");
   if (explicit === "light" || explicit === "dark") return explicit;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 // Minimal typing for the View Transitions API (not in TS's DOM lib yet).
@@ -22,7 +22,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setTheme(readEffectiveTheme()));
-    const mq = window.matchMedia("(prefers-color-scheme: light)");
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onSystemChange = () => {
       if (!localStorage.getItem("theme")) setTheme(readEffectiveTheme());
     };

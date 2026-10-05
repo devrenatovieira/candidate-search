@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from elosys.db import connect, create_schema
-from elosys.tse import accounts
+from candidate_search.db import connect, create_schema
+from candidate_search.tse import accounts
 
 _CPF = "11144477735"
 _CNPJ = "40430149000110"

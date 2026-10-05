@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from elosys.db import connect, create_schema
-from elosys.rules import social_review
+from candidate_search.db import connect, create_schema
+from candidate_search.rules import social_review
 
 T = "2026-01-01T00:00:00Z"
 

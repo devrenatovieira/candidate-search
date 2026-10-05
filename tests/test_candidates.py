@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from elosys import provenance
-from elosys.db import connect, create_schema
-from elosys.tse import candidates
+from candidate_search import provenance
+from candidate_search.db import connect, create_schema
+from candidate_search.tse import candidates
 
 HEADER = (
     "ANO_ELEICAO;NM_TIPO_ELEICAO;NR_TURNO;SG_UF;SG_UE;NM_UE;DS_CARGO;SQ_CANDIDATO;"

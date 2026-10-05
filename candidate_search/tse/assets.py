@@ -20,7 +20,7 @@ from ..provenance import (
 )
 from ..util import brl_to_cents, clean_tse, iso_date, now_utc
 
-log = get_logger("elosys.tse.assets")
+log = get_logger("candidate_search.tse.assets")
 
 PARSER_NAME = "tse.assets"
 PARSER_VERSION = "1.0"
@@ -79,7 +79,7 @@ def run(con: sqlite3.Connection, *, years: list[int] | None = None,
 
     ph_rows = con.execute("SELECT count(*) FROM politician_history").fetchone()[0]
     if ph_rows == 0:
-        log.warning("politician_history is empty — run `elosys tse-candidates` first "
+        log.warning("politician_history is empty — run `candidate-search tse-candidates` first "
                     "so declared_assets rows can link to a person; continuing without it")
 
     source_id = get_source(con, **SOURCE)

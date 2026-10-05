@@ -8,15 +8,15 @@ export type ColorMode = "light" | "dark";
 function resolve(): ColorMode {
   const attr = document.documentElement.getAttribute("data-theme");
   if (attr === "light" || attr === "dark") return attr;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 export function useColorMode(): ColorMode {
-  const [mode, setMode] = useState<ColorMode>("dark");
+  const [mode, setMode] = useState<ColorMode>("light");
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setMode(resolve()));
-    const mq = window.matchMedia("(prefers-color-scheme: light)");
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => setMode(resolve());
     mq.addEventListener("change", onChange);
     const mo = new MutationObserver(onChange);

@@ -96,7 +96,7 @@ export default async function SocioFornecedorPage({ searchParams }: PageProps<"/
             title="nenhum vínculo ainda"
             hint={
               <>
-                <code>elosys candidate-supplier-partner --db elosys.db</code> (precisa de quadro
+                <code>candidate-search candidate-supplier-partner --db candidate_search.db</code> (precisa de quadro
                 societário já coletado via <code>receita-cnpj</code>)
               </>
             }

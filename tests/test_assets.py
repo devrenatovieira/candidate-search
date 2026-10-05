@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from elosys.db import connect, create_schema
-from elosys.tse import assets
+from candidate_search.db import connect, create_schema
+from candidate_search.tse import assets
 
 _SQ = "250001606095"
 

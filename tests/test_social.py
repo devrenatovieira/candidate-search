@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from elosys.db import connect, create_schema
-from elosys.social import lexicon, x_posts
+from candidate_search.db import connect, create_schema
+from candidate_search.social import lexicon, x_posts
 
 T = "2026-01-01T00:00:00Z"
 

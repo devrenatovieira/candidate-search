@@ -13,7 +13,7 @@ from ..util import canonical_json, now_utc
 from .apify import run_actor
 from .lexicon import all_terms, build_queries
 
-log = get_logger("elosys.social.x_posts")
+log = get_logger("candidate_search.social.x_posts")
 
 NETWORK = "x"
 DEFAULT_SINCE = "2019-01-01"
@@ -46,9 +46,9 @@ SOURCE = dict(
         "TSE (rede_social_candidato, Res. TSE 23.610/2019). Conteúdo coletado só "
         "de perfis públicos, texto apenas."
     ),
-    notes="Conteúdo efêmero: não entra no manifest.json / elosys verify. A "
+    notes="Conteúdo efêmero: não entra no manifest.json / candidate-search verify. A "
           "integridade é o payload cru + sha256 + retrieved_at em social_post "
-          "(ver schema.sql e elosys/social/__init__.py).",
+          "(ver schema.sql e candidate_search/social/__init__.py).",
 )
 
 

@@ -15,9 +15,11 @@ type Ctx = {
   setPaletteOpen: (open: boolean) => void;
   analysisMode: boolean;
   setAnalysisMode: (on: boolean) => void;
+  navOpen: boolean;
+  setNavOpen: (open: boolean) => void;
 };
 
-const DEFAULT_HEADER: PageHeaderState = { group: "EloSys", current: "" };
+const DEFAULT_HEADER: PageHeaderState = { group: "Candidate Search", current: "" };
 
 const ShellCtx = createContext<Ctx | null>(null);
 
@@ -25,9 +27,19 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   const [header, setHeader] = useState<PageHeaderState>(DEFAULT_HEADER);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [analysisMode, setAnalysisMode] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <ShellCtx.Provider value={{ header, setHeader, paletteOpen, setPaletteOpen, analysisMode, setAnalysisMode }}>
+    <ShellCtx.Provider value={{
+        header,
+        setHeader,
+        paletteOpen,
+        setPaletteOpen,
+        analysisMode,
+        setAnalysisMode,
+        navOpen,
+        setNavOpen,
+      }}>
       {children}
     </ShellCtx.Provider>
   );

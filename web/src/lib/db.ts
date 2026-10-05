@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import path from "node:path";
 
-const DB_PATH = process.env.ELOSYS_DB_PATH ?? path.join(process.cwd(), "..", "elosys.db");
+const DB_PATH = process.env.CANDIDATE_SEARCH_DB_PATH ?? path.join(process.cwd(), "..", "candidate_search.db");
 
 let _db: Database.Database | null = null;
 

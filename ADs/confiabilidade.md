@@ -42,7 +42,7 @@ interpretamos" — se o parser tiver bug, conserta o código e rebuilda (ver
 
 Além do banco, cada build escreve **`manifest.json`** (todas as `collection` +
 `collection_file` com seus hashes) e o commita no git — é a âncora de integridade
-e a entrada do `elosys verify`.
+e a entrada do `candidate-search verify`.
 
 ### 2. NÃO guardamos o arquivo bruto, NEM cópia verbatim das linhas
 
@@ -53,7 +53,7 @@ e (b) guardar a linha original de cada registro numa coluna `raw_data`.
 - (b) **Descartado por redundância:** `raw_data` era ~1,45 GB de um `.db` de 2,5 GB
   e provava a mesma coisa que `collection_file.sha256` — um cético não confia mais
   na *nossa transcrição* do CSV do que no hash do arquivo. Quem quer conferir
-  re-baixa o zip do TSE (`elosys verify` faz isso) e reprocessa. Se o parser
+  re-baixa o zip do TSE (`candidate-search verify` faz isso) e reprocessa. Se o parser
   larga um campo, isso é bug a corrigir + rebuild, não um problema de retenção.
 
 O que `collection` registra é suficiente para o usuário refazer o caminho:
@@ -106,7 +106,7 @@ Normalização de nome, tentativa de desmascarar CPF, dedução de UF etc. são 
 no parser, e o `parser_commit`/`parser_version` da `parse` identifica a versão da
 transformação. Como o build é rewrite-only, "refazer com outra versão" = trocar o
 código e rebuildar — o valor bruto está sempre no arquivo da fonte (hash em
-`collection_file`), reproduzível via `elosys verify`.
+`collection_file`), reproduzível via `candidate-search verify`.
 
 ### 5. Correlações também têm source
 
@@ -120,10 +120,10 @@ em [dados_derivados.md](dados_derivados.md).
   storage no MVP — não guardamos payload.
 - **Ingestão mais cara:** todo coletor tem que registrar uma `collection` antes de
   escrever dado, e todo parser tem que abrir um `parse`. Padronizado no módulo
-  `elosys.provenance` para não reimplementar.
+  `candidate_search.provenance` para não reimplementar.
 - **Auditável de ponta a ponta:** dá para responder "de onde veio isso?" com um JOIN
   (`record → parse → collection → source`) e entregar ao usuário `url + accessed_at +
-  sha256` para ele refazer o download e conferir — ou rodar `elosys verify`.
+  sha256` para ele refazer o download e conferir — ou rodar `candidate-search verify`.
 - O build inteiro é reproduzível a partir do `manifest.json` commitado.
 - **Limitação conhecida:** não conseguimos provar o conteúdo de uma coleta antiga se
   a fonte alterar o arquivo — ver Riscos aceitos em §2.

@@ -95,18 +95,18 @@ export function TopSuppliers({ years, initialYear }: { years: number[]; initialY
                 </span>
                 <Link
                   href={`/cnpj/${s.cnpj}`}
-                  className="min-w-0 flex-1 truncate text-[14px] hover:text-elo-amber hover:underline"
+                  className="min-w-0 flex-1 truncate text-[14px] hover:text-brand hover:underline"
                 >
                   {s.name}
                 </Link>
-                <span className="flex-none font-mono text-[13px] text-elo-amber">
+                <span className="flex-none font-mono text-[13px] text-brand">
                   {formatBRL(s.totalCents)}
                 </span>
               </div>
               <div className="mt-2 flex items-center gap-3 pl-9">
                 <div className="h-[3px] flex-1 bg-[var(--hover)]">
                   <div
-                    className="h-[3px] bg-elo-amber"
+                    className="h-[3px] bg-brand"
                     style={{ width: `${Math.max(2, (s.totalCents / max) * 100)}%` }}
                   />
                 </div>

@@ -1,4 +1,4 @@
-"""Elosys CLI — one independent crawler per data source (see ADs/imutabilidade.md)."""
+"""Candidate Search CLI — one independent crawler per data source (see ADs/imutabilidade.md)."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from .transparencia import earmarks, sanctions
 from .tse import accounts, assets, candidates, photo_urls, social
 
 DEFAULT_TMP = "dados_tmp"
-log = get_logger("elosys.cli")
+log = get_logger("candidate_search.cli")
 
 
 def _init_db(args: argparse.Namespace) -> int:
@@ -235,12 +235,12 @@ def _verify(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="elosys")
-    p.add_argument("--version", action="version", version=f"elosys {__version__}")
+    p = argparse.ArgumentParser(prog="candidate-search")
+    p.add_argument("--version", action="version", version=f"candidate-search {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     pi = sub.add_parser("init-db", help="create the database and apply the schema")
-    pi.add_argument("--db", default="elosys.db")
+    pi.add_argument("--db", default="candidate_search.db")
     pi.set_defaults(func=_init_db)
 
     for cmd, mod, name, helptext in (
@@ -250,14 +250,14 @@ def main(argv: list[str] | None = None) -> int:
         ("tse-assets", assets, "tse_assets", "ingest TSE bem_candidato -> declared_assets"),
     ):
         sp = sub.add_parser(cmd, help=helptext)
-        sp.add_argument("--db", default="elosys.db")
+        sp.add_argument("--db", default="candidate_search.db")
         sp.add_argument("--years", help="e.g. 2018,2020,2022,2024,2026 (default: all supported)")
         sp.add_argument("--tmp", default=DEFAULT_TMP, help="temporary download directory")
         sp.set_defaults(func=lambda a, _m=mod, _n=name: _run_crawler(a, _m, _n))
 
     pc = sub.add_parser("receita-cnpj",
                         help="incremental CNPJ registry lookup (BrasilAPI) -> company_registry/company_partner")
-    pc.add_argument("--db", default="elosys.db")
+    pc.add_argument("--db", default="candidate_search.db")
     pc.add_argument("--limit", type=int, default=receita_cnpj.DEFAULT_LIMIT,
                     help="how many missing companies to fetch this run (default: %(default)s)")
     pc.add_argument("--order", choices=("money", "id"), default=receita_cnpj.DEFAULT_ORDER,
@@ -271,7 +271,7 @@ def main(argv: list[str] | None = None) -> int:
 
     pf = sub.add_parser("tse-photo-urls",
                         help="incremental DivulgaCandContas fotoUrl lookup -> candidate_photo")
-    pf.add_argument("--db", default="elosys.db")
+    pf.add_argument("--db", default="candidate_search.db")
     pf.add_argument("--limit", type=int, default=photo_urls.DEFAULT_LIMIT,
                     help="how many people (missing a lookup) to check this run (default: %(default)s)")
     pf.add_argument("--person-ids", help="comma-separated person ids to fetch instead of the queue")
@@ -284,14 +284,14 @@ def main(argv: list[str] | None = None) -> int:
 
     ps = sub.add_parser("transparencia-sanctions",
                         help="ingest CEIS/CNEP (Portal da Transparencia) -> sanction")
-    ps.add_argument("--db", default="elosys.db")
+    ps.add_argument("--db", default="candidate_search.db")
     ps.add_argument("--tmp", default=DEFAULT_TMP, help="temporary download directory")
     ps.set_defaults(func=_run_sanctions)
 
     pe = sub.add_parser("transparencia-earmarks",
                         help="ingest Emendas Parlamentares (Portal da Transparencia) -> "
                              "parliamentary_earmark(_beneficiary)")
-    pe.add_argument("--db", default="elosys.db")
+    pe.add_argument("--db", default="candidate_search.db")
     pe.add_argument("--tmp", default=DEFAULT_TMP, help="temporary download directory")
     pe.set_defaults(func=_run_earmarks)
 
@@ -300,12 +300,12 @@ def main(argv: list[str] | None = None) -> int:
          "flag campaign_expense rows: cheap-sounding item, disproportionate value"),
     ):
         sp = sub.add_parser(cmd, help=helptext)
-        sp.add_argument("--db", default="elosys.db")
+        sp.add_argument("--db", default="candidate_search.db")
         sp.set_defaults(func=lambda a, _m=mod, _n=name: _run_rule(a, _m, _n))
 
     prc = sub.add_parser("rule-circular-donations",
                          help="find loops of donations/expenses across the whole database (Tarjan SCC + bounded DFS)")
-    prc.add_argument("--db", default="elosys.db")
+    prc.add_argument("--db", default="candidate_search.db")
     prc.add_argument("--max-depth", type=int, default=circular_donations.DEFAULT_MAX_DEPTH,
                      help="max cycle length in hops (default: %(default)s)")
     prc.add_argument("--max-fanout", type=int, default=circular_donations.DEFAULT_MAX_FANOUT,
@@ -318,12 +318,12 @@ def main(argv: list[str] | None = None) -> int:
     pcsp = sub.add_parser(
         "candidate-supplier-partner",
         help="candidatos sócios de empresas que receberam pagamento de campanha (match não determinístico)")
-    pcsp.add_argument("--db", default="elosys.db")
+    pcsp.add_argument("--db", default="candidate_search.db")
     pcsp.set_defaults(func=lambda a: _run_rule(a, candidate_supplier_partner, "candidate_supplier_partner"))
 
     par = sub.add_parser("ai-review",
                          help="LLM (DeepSeek) second opinion on signals: rotineiro vs. bizarro. Needs DEEPSEEK_API_KEY")
-    par.add_argument("--db", default="elosys.db")
+    par.add_argument("--db", default="candidate_search.db")
     par.add_argument("--limit", type=int, default=ai_review.DEFAULT_LIMIT,
                      help="how many signals PER RULE to review this run, biggest-money first (default: %(default)s)")
     par.add_argument("--rule", help="comma-separated subset of: circular_donations,disproportionate_expense")
@@ -337,7 +337,7 @@ def main(argv: list[str] | None = None) -> int:
 
     psx = sub.add_parser("social-x",
                          help="coleta posts/replies do X de contas declaradas ao TSE (Apify). Needs APIFY_TOKEN")
-    psx.add_argument("--db", default="elosys.db")
+    psx.add_argument("--db", default="candidate_search.db")
     psx.add_argument("--scope", choices=("federal", "deputados", "electeds", "all"), default="federal",
                      help="quais candidatos (default: %(default)s = eleitos dep. federal/senador)")
     psx.add_argument("--limit", type=int, help="máximo de contas a coletar nesta execução")
@@ -356,7 +356,7 @@ def main(argv: list[str] | None = None) -> int:
 
     psr = sub.add_parser("social-review",
                          help="LLM (DeepSeek) classifica posts do X coletados: discurso pejorativo vs. uso legítimo")
-    psr.add_argument("--db", default="elosys.db")
+    psr.add_argument("--db", default="candidate_search.db")
     psr.add_argument("--limit", type=int, default=social_review.DEFAULT_LIMIT,
                      help="quantos posts revisar nesta execução (default: %(default)s)")
     psr.add_argument("--model", default=social_review.DEFAULT_MODEL, help="modelo DeepSeek")
@@ -369,12 +369,12 @@ def main(argv: list[str] | None = None) -> int:
     psr.set_defaults(func=_run_social_review)
 
     pm = sub.add_parser("manifest", help="write the input manifest (sources + hashes)")
-    pm.add_argument("--db", default="elosys.db")
+    pm.add_argument("--db", default="candidate_search.db")
     pm.add_argument("--out", default="manifest.json")
     pm.set_defaults(func=_manifest)
 
     pv = sub.add_parser("verify", help="re-download sources and check hashes against the build")
-    pv.add_argument("--db", default="elosys.db")
+    pv.add_argument("--db", default="candidate_search.db")
     pv.set_defaults(func=_verify)
 
     args = p.parse_args(argv)

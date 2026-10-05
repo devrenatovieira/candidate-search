@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from elosys.db import connect, create_schema
-from elosys.rules import candidate_supplier_partner as rule
+from candidate_search.db import connect, create_schema
+from candidate_search.rules import candidate_supplier_partner as rule
 
 T = "2026-01-01T00:00:00Z"
 CPF = "12449853800"

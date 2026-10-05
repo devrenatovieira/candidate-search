@@ -21,7 +21,7 @@ from ..provenance import (
 )
 from ..util import clean_tse, digits_only, iso_date, normalize_name, now_utc
 
-log = get_logger("elosys.tse.candidates")
+log = get_logger("candidate_search.tse.candidates")
 
 PARSER_NAME = "tse.candidates"
 PARSER_VERSION = "2.0"

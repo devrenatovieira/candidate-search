@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from elosys.db import connect, create_schema
-from elosys.transparencia import sanctions
+from candidate_search.db import connect, create_schema
+from candidate_search.transparencia import sanctions
 
 _CPF_KNOWN = "11144477735"
 _CPF_UNKNOWN = "45612378900"

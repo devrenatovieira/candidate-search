@@ -68,10 +68,10 @@ build descartável (ver [imutabilidade.md](imutabilidade.md)):
 - **Sem triggers de imutabilidade.** As tabelas são mutáveis durante o build (o
   `promote` faz `UPDATE`/`DELETE`). Consumidores abrem com `PRAGMA query_only=ON`.
 - O staging é `CREATE TEMP TABLE` — não entra no `.db` entregue.
-- A âncora de integridade é o **`manifest.json` commitado no git** + `elosys
+- A âncora de integridade é o **`manifest.json` commitado no git** + `candidate-search
   verify`, não o arquivo `.db` nem hash chain.
-- Implementação em `elosys/db.py` (`connect(write=...)`, `create_schema`) e no
-  `promote` de `elosys/tse/candidates.py`.
+- Implementação em `candidate_search/db.py` (`connect(write=...)`, `create_schema`) e no
+  `promote` de `candidate_search/tse/candidates.py`.
 
 ### 5. Full-text / normalização de nome
 

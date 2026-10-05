@@ -155,7 +155,7 @@ export default async function DiscursoPage({ searchParams }: PageProps<"/sinais/
             title="nenhum post revisado ainda"
             hint={
               <>
-                <code>elosys social-x</code> e <code>elosys social-review</code> (precisa de{" "}
+                <code>candidate-search social-x</code> e <code>candidate-search social-review</code> (precisa de{" "}
                 <code>APIFY_TOKEN</code> e <code>DEEPSEEK_API_KEY</code>)
               </>
             }

@@ -11,7 +11,7 @@ from ..log import RowCounter, get_logger, step
 from ..provenance import download, get_source, record_collection, record_parse
 from ..util import brl_to_cents, digits_only, iso_date, now_utc
 
-log = get_logger("elosys.receita.cnpj")
+log = get_logger("candidate_search.receita.cnpj")
 
 PARSER_NAME = "receita.cnpj"
 PARSER_VERSION = "1.0"
@@ -50,7 +50,7 @@ SOURCE = dict(
         "BrasilAPI e um proxy publico e gratuito sobre esses dados oficiais."
     ),
     notes="Fetched incrementally, one CNPJ per HTTP request -- see schema.sql comment "
-          "above company_registry for why this is not rewrite-only like the rest of elosys.",
+          "above company_registry for why this is not rewrite-only like the rest of Candidate Search.",
 )
 
 

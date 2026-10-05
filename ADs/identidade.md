@@ -63,7 +63,7 @@ mascarada (2024) ou derrubada por ambiguidade?". O mesmo conteúdo sai também n
 
 ### 2. Duas passadas SQL no build (staging → promote)
 
-Implementado em `elosys/tse/candidates.py`.
+Implementado em `candidate_search/tse/candidates.py`.
 
 1. **Stage** — cada CSV é parseado para `stg_candidate` (`CREATE TEMP TABLE`, só na
    conexão do build), com CPF/título como vieram. Nada de identidade ainda.
@@ -81,7 +81,7 @@ reais num CPF errado da fonte. Medido em 2018–2026: ~35 CPFs, ~63 linhas.
 
 ### 3. Ordem de matching (determinística)
 
-`elosys/identity.py`, chamado pelo promote (CPF já limpo):
+`candidate_search/identity.py`, chamado pelo promote (CPF já limpo):
 
 1. `voter_id` já em alguma `people` → aquela pessoa.
 2. senão, CPF válido já em alguma `people` → aquela pessoa.

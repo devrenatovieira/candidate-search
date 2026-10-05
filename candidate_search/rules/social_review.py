@@ -10,7 +10,7 @@ from ..ai.deepseek import DEFAULT_MODEL, DeepSeekError, chat_json
 from ..log import RowCounter, get_logger, step
 from ..util import now_utc
 
-log = get_logger("elosys.rules.social_review")
+log = get_logger("candidate_search.rules.social_review")
 
 DEFAULT_LIMIT = 100
 DEFAULT_WORKERS = 8

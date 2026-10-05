@@ -22,7 +22,7 @@ não existe.
 
 ### 1. Modelo de execução: rewrite-only
 
-- `elosys` constrói o banco inteiro num run, do arquivo vazio até o `.db` pronto.
+- `candidate-search` constrói o banco inteiro num run, do arquivo vazio até o `.db` pronto.
 - **Sem update incremental, sem append-only, sem correção in-place.** Valor errado
   = bug de parser → conserta o código, rebuilda.
 - Nenhum trigger de imutabilidade. As tabelas são mutáveis *durante o build* (o
@@ -44,7 +44,7 @@ Esse arquivo é **commitado no repositório**. O histórico do git passa a ser o
 imutável, de graça e auditável por terceiros: reescrever o que foi coletado exige
 reescrever o histórico público do repo, o que é visível.
 
-- `elosys verify` re-baixa cada URL do manifesto e confere o `payload_sha256`.
+- `candidate-search verify` re-baixa cada URL do manifesto e confere o `payload_sha256`.
   Lista vazia = o banco é 100% reconstruível a partir das fontes públicas.
 - `run_report.json` (também commitado) registra as decisões do build: linhas por
   ano, CPFs derrubados por ambiguidade e o motivo, colisões puladas.
@@ -57,12 +57,12 @@ Append-only provava "não reescrevemos *a linha R* depois". Rewrite-only não pr
 isso sozinho. Cobrem essa lacuna:
 
 - o `manifest.json` + `run_report.json` commitados (o git é o histórico);
-- o build ser determinístico e verificável (`elosys verify`);
+- o build ser determinístico e verificável (`candidate-search verify`);
 - se ainda for pouco, guardar os zips do `consulta_cand` (~1 GB todos os anos)
   num store por hash — TODO em [confiabilidade.md](confiabilidade.md).
 
 O risco real que sobra é o **da fonte**: o TSE republicar um arquivo no mesmo URL
-com valores diferentes (eles fazem — CPF 2024/2026). Nesse caso `elosys verify`
+com valores diferentes (eles fazem — CPF 2024/2026). Nesse caso `candidate-search verify`
 acusa a mudança; o valor antigo só é recuperável se tivermos guardado o zip.
 
 ## Consequências
@@ -73,10 +73,10 @@ acusa a mudança; o valor antigo só é recuperável se tivermos guardado o zip.
   porque o banco é descartável: a correção é no código + rebuild.
 - O artefato de auditoria saiu do `.db` e foi para arquivos versionados
   (`manifest.json`, `run_report.json`).
-- `elosys verify` custa uma re-coleta completa (rede). É comando sob demanda.
+- `candidate-search verify` custa uma re-coleta completa (rede). É comando sob demanda.
 
 ## Pontos em aberto
 
-- ⚠️ Automatizar `elosys verify` (CI semanal?) e alertar quando uma fonte muda.
+- ⚠️ Automatizar `candidate-search verify` (CI semanal?) e alertar quando uma fonte muda.
 - ⚠️ Commitar o `sha256` do `.db` no repo a cada build oficial — decidir o fluxo
   (o `.db` em si continua fora do git, ver `.gitignore`).

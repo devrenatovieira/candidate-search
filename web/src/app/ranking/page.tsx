@@ -41,7 +41,7 @@ export default async function RankingPage({ searchParams }: PageProps<"/ranking"
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        group="EloSys"
+        group="Candidate Search"
         current="Ranking"
         actions={
           tipo === "bens" ? (
@@ -215,7 +215,7 @@ function CrescimentoTable({
                   {formatBRL(r.lastCents)}
                   <div className="mono" style={{ fontSize: 9.5, color: "var(--muted-2)" }}>{r.lastYear}</div>
                 </td>
-                <td className={`num ${r.growthCents >= 0 ? "text-elo-green" : "text-elo-red"}`}>
+                <td className={`num ${r.growthCents >= 0 ? "text-signal-green" : "text-signal-red"}`}>
                   {r.growthCents >= 0 ? "+" : ""}{formatBRL(r.growthCents)}
                   {r.growthPct != null ? (
                     <div className="mono" style={{ fontSize: 9.5, color: "var(--muted-2)" }}>

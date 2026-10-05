@@ -51,7 +51,7 @@ export function EntityNode({ data, selected }: NodeProps & { data: GraphNodeData
       >
         {data.label}
       </div>
-      <div className="font-mono text-[7.5px] tracking-[0.1em] text-[var(--muted-2)] uppercase">
+      <div className="font-mono text-[7.5px] text-[var(--muted-2)]">
         {data.circular ? "doação circular" : NODE_KIND_LABEL[data.kind]}
       </div>
     </div>

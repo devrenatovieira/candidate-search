@@ -12,7 +12,7 @@ from ..log import RowCounter, get_logger, step
 from ..provenance import download, get_source, record_collection, record_parse
 from ..util import now_utc
 
-log = get_logger("elosys.tse.photo_urls")
+log = get_logger("candidate_search.tse.photo_urls")
 
 PARSER_NAME = "tse.photo_urls"
 PARSER_VERSION = "2.0"

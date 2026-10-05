@@ -1,7 +1,8 @@
 {
-  "name": "web",
+  "name": "candidate-search-web",
   "version": "0.1.0",
   "private": true,
+  "author": "Renato Vieira",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

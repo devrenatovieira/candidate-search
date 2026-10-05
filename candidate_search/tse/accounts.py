@@ -21,7 +21,7 @@ from ..provenance import (
 )
 from ..util import brl_to_cents, clean_tse, digits_only, iso_date, normalize_name, now_utc
 
-log = get_logger("elosys.tse.accounts")
+log = get_logger("candidate_search.tse.accounts")
 
 PARSER_NAME = "tse.accounts"
 PARSER_VERSION = "4.0"
@@ -122,7 +122,7 @@ def run(con: sqlite3.Connection, *, years: list[int] | None = None,
 
     ph_rows = con.execute("SELECT count(*) FROM politician_history").fetchone()[0]
     if ph_rows == 0:
-        log.warning("politician_history is empty — run `elosys tse-candidates` first "
+        log.warning("politician_history is empty — run `candidate-search tse-candidates` first "
                     "for identity to link up; continuing with CPF-only matching")
     rejected_cpf = {r["cpf"] for r in con.execute("SELECT cpf FROM rejected_cpf")}
     cpf_to_person = dict(con.execute("SELECT cpf, id FROM people WHERE cpf IS NOT NULL"))

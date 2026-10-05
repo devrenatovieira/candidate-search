@@ -23,7 +23,7 @@ from ..provenance import (
 )
 from ..util import brl_to_cents, clean_tse, digits_only, iso_date, now_utc
 
-log = get_logger("elosys.transparencia.sanctions")
+log = get_logger("candidate_search.transparencia.sanctions")
 
 PARSER_NAME = "transparencia.sanctions"
 PARSER_VERSION = "1.0"

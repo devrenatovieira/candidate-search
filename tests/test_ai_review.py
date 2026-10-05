@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from elosys.db import connect, create_schema
-from elosys.rules import ai_review, circular_donations
+from candidate_search.db import connect, create_schema
+from candidate_search.rules import ai_review, circular_donations
 
 T = "2026-01-01T00:00:00Z"
 

@@ -1,4 +1,4 @@
-# EloSys
+# Candidate Search
 DB consolidada de candidatos brasileiros (2014 a 2026), construída **exclusivamente** a partir de fontes oficiais e cruzada por CPF e CNPJ. 
 
 
@@ -7,10 +7,10 @@ DB consolidada de candidatos brasileiros (2014 a 2026), construída **exclusivam
 O objetivo é apoiar a investigação de relações entre agentes políticos e identificar indícios de padrões atípicos, como doações circulares, fracionamento de doações, empresas de fachada e evolução patrimonial incompatível.
 
 
-> **Aviso.** Os resultados do Elosys são indícios, não provas, e não constituem acusação contra nenhuma pessoa. O sistema produz sinais de alerta destinados à verificação por órgãos competentes (Ministério Público, TCU, Receita Federal, COAF). Cada dado exibido indica o arquivo público de origem, que pode ser baixado novamente e conferido por hash.
+> **Aviso.** Os resultados do Candidate Search são indícios, não provas, e não constituem acusação contra nenhuma pessoa. O sistema produz sinais de alerta destinados à verificação por órgãos competentes (Ministério Público, TCU, Receita Federal, COAF). Cada dado exibido indica o arquivo público de origem, que pode ser baixado novamente e conferido por hash.
 
 ## Visão geral
-- **Backend:** pipeline de coleta em Python, com armazenamento em SQLite (`elosys.db`).
+- **Backend:** pipeline de coleta em Python, com armazenamento em SQLite (`candidate_search.db`).
 - **Frontend:** aplicação Next.js somente leitura, em `/web`, que permite buscar candidatos e consultar a ficha completa com a fonte de cada campo.
 
 ## Uso com o banco pré-construído
@@ -58,16 +58,22 @@ sha256sum elosys.zip                          # Linux, macOS, Git Bash
 Get-FileHash elosys.zip -Algorithm SHA256     # PowerShell
 ```
 
-Extraia o arquivo e posicione `elosys.db` na raiz do repositório. O banco já inclui todas as tabelas e o índice de busca por nome de doador e fornecedor.
+O arquivo publicado ainda usa o nome antigo do projeto e contém `elosys.db`. Extraia e renomeie para `candidate_search.db` na raiz do repositório:
+
+```bash
+unzip elosys.zip && mv elosys.db candidate_search.db
+```
+
+O banco já inclui todas as tabelas e o índice de busca por nome de doador e fornecedor.
 
 ### 2. Execução local
 
 Requisitos: Node.js 20.9 ou superior e git.
 
 ```bash
-git clone https://github.com/YuriRDev/elosys.git
-cd elosys
-# copie o elosys.db para esta pasta
+git clone https://github.com/devrenatovieira/candidate-search.git
+cd candidate-search
+# copie o candidate_search.db para esta pasta
 
 cd web
 npm install
@@ -77,7 +83,7 @@ npm run dev        # http://localhost:3000
 A aplicação abre o banco em modo somente leitura e não realiza nenhuma escrita. Para utilizar outro caminho:
 
 ```bash
-ELOSYS_DB_PATH=/caminho/para/elosys.db npm run dev
+CANDIDATE_SEARCH_DB_PATH=/caminho/para/candidate_search.db npm run dev
 ```
 
 Build de produção:
@@ -94,7 +100,7 @@ Requisito: [uv](https://github.com/astral-sh/uv), que instala o Python 3.12 e as
 
 ```bash
 uv sync
-uv run elosys init-db --db elosys.db
+uv run candidate-search init-db --db candidate_search.db
 ```
 
 ### Etapa 1: coleta das fontes
@@ -102,12 +108,12 @@ uv run elosys init-db --db elosys.db
 Cada coletor é independente e opera em modo *rewrite-only*: remove as tabelas sob sua responsabilidade e as reconstrói. Sem o parâmetro `--years`, todos os anos suportados são processados.
 
 ```bash
-uv run elosys tse-candidates          --db elosys.db   # candidaturas 2014–2026
-uv run elosys tse-accounts            --db elosys.db   # CNPJ de campanha, doações e despesas (etapa mais longa)
-uv run elosys tse-social              --db elosys.db   # redes sociais declaradas
-uv run elosys tse-assets              --db elosys.db   # bens declarados
-uv run elosys transparencia-sanctions --db elosys.db   # CEIS/CNEP
-uv run elosys transparencia-earmarks  --db elosys.db   # emendas parlamentares
+uv run candidate-search tse-candidates          --db candidate_search.db   # candidaturas 2014–2026
+uv run candidate-search tse-accounts            --db candidate_search.db   # CNPJ de campanha, doações e despesas (etapa mais longa)
+uv run candidate-search tse-social              --db candidate_search.db   # redes sociais declaradas
+uv run candidate-search tse-assets              --db candidate_search.db   # bens declarados
+uv run candidate-search transparencia-sanctions --db candidate_search.db   # CEIS/CNEP
+uv run candidate-search transparencia-earmarks  --db candidate_search.db   # emendas parlamentares
 ```
 
 Caso algum download retorne HTTP 403 (bloqueio anti-bot da fonte), baixe o arquivo `.zip` pelo navegador, salve-o em `dados_tmp/` com o nome indicado no log e execute o coletor novamente. O arquivo local será utilizado.
@@ -115,8 +121,8 @@ Caso algum download retorne HTTP 403 (bloqueio anti-bot da fonte), baixe o arqui
 ### Etapa 2: enriquecimento (opcional, incremental)
 
 ```bash
-uv run elosys receita-cnpj   --db elosys.db --limit 500   # dados cadastrais e sócios de CNPJ (BrasilAPI)
-uv run elosys tse-photo-urls --db elosys.db --limit 500   # foto oficial dos candidatos
+uv run candidate-search receita-cnpj   --db candidate_search.db --limit 500   # dados cadastrais e sócios de CNPJ (BrasilAPI)
+uv run candidate-search tse-photo-urls --db candidate_search.db --limit 500   # foto oficial dos candidatos
 ```
 
 Ambos os comandos são incrementais e preservam os registros existentes. Execuções sucessivas ampliam a cobertura.
@@ -129,7 +135,7 @@ A busca por doadores e fornecedores que nunca foram candidatos depende de uma ta
 ```bash
 uv run python - <<'PY'
 import sqlite3
-con = sqlite3.connect("elosys.db")
+con = sqlite3.connect("candidate_search.db")
 con.executescript("""
 DELETE FROM pessoa_fisica_search;
 INSERT INTO pessoa_fisica_search (cpf, name)
@@ -152,9 +158,9 @@ PY
 As regras operam sobre os dados coletados e geram os sinais de alerta.
 
 ```bash
-uv run elosys rule-disproportionate-expense --db elosys.db
-uv run elosys rule-circular-donations       --db elosys.db   # cerca de 25 min na base completa
-uv run elosys candidate-supplier-partner    --db elosys.db   # requer receita-cnpj (quadro societário)
+uv run candidate-search rule-disproportionate-expense --db candidate_search.db
+uv run candidate-search rule-circular-donations       --db candidate_search.db   # cerca de 25 min na base completa
+uv run candidate-search candidate-supplier-partner    --db candidate_search.db   # requer receita-cnpj (quadro societário)
 ```
 
 ### Etapa 5: análises complementares com LLM e X (opcional)
@@ -163,25 +169,25 @@ Exigem chaves de API definidas em variáveis de ambiente. Chaves nunca devem ser
 
 ```bash
 export DEEPSEEK_API_KEY=...
-uv run elosys ai-review --db elosys.db --limit 100 --order tight
+uv run candidate-search ai-review --db candidate_search.db --limit 100 --order tight
 
 export APIFY_TOKEN=...
-uv run elosys social-x      --db elosys.db --scope federal
-uv run elosys social-review --db elosys.db --limit 5000
+uv run candidate-search social-x      --db candidate_search.db --scope federal
+uv run candidate-search social-review --db candidate_search.db --limit 5000
 ```
 
 ### Etapa 6: manifesto e testes
 
 ```bash
-uv run elosys manifest --db elosys.db   # gera manifest.json com URL e SHA-256 de cada fonte
+uv run candidate-search manifest --db candidate_search.db   # gera manifest.json com URL e SHA-256 de cada fonte
 uv run pytest                           # testes com fixtures, sem acesso à rede
 ```
 
-Como os coletores são *rewrite-only*, cada tabela passa a conter exatamente os anos informados em `--years`. Para partir de um estado completamente limpo, remova `elosys.db` e reinicie o processo.
+Como os coletores são *rewrite-only*, cada tabela passa a conter exatamente os anos informados em `--years`. Para partir de um estado completamente limpo, remova `candidate_search.db` e reinicie o processo.
 
 ## Arquitetura
 
-Cada fonte de dados possui um coletor independente em `elosys/tse/*.py`. A execução de um coletor descarta as tabelas correspondentes e as reconstrói a partir dos arquivos oficiais. O banco é tratado como artefato descartável; a garantia de integridade está no `manifest.json`, versionado no repositório.
+Cada fonte de dados possui um coletor independente em `candidate_search/tse/*.py`. A execução de um coletor descarta as tabelas correspondentes e as reconstrói a partir dos arquivos oficiais. O banco é tratado como artefato descartável; a garantia de integridade está no `manifest.json`, versionado no repositório.
 
 ### Estrutura do banco
 
@@ -232,7 +238,7 @@ Na base completa, foram identificados 533 vínculos possíveis, envolvendo R$ 19
 
 ### Revisão por LLM (`ai-review`, opcional)
 
-O módulo `elosys/rules/ai_review.py` submete os fatos de cada sinal de doação circular ou despesa desproporcional a um modelo de linguagem (DeepSeek), que avalia se o caso aparenta ser rotineiro ou atípico. A resposta, a justificativa, os fatos citados e o prompt utilizado são armazenados em `signal_ai_review` (um registro por sinal e modelo), permitindo auditoria humana do raciocínio.
+O módulo `candidate_search/rules/ai_review.py` submete os fatos de cada sinal de doação circular ou despesa desproporcional a um modelo de linguagem (DeepSeek), que avalia se o caso aparenta ser rotineiro ou atípico. A resposta, a justificativa, os fatos citados e o prompt utilizado são armazenados em `signal_ai_review` (um registro por sinal e modelo), permitindo auditoria humana do raciocínio.
 
 O processo é incremental: novas execuções ampliam a cobertura e `--refresh` reprocessa sinais já avaliados. A ordenação pode priorizar valor (`--order amount`) ou ciclos mais curtos (`--order tight`). A chave de API deve ser fornecida via `DEEPSEEK_API_KEY`. Os resultados estão em `/sinais/analise-ia`. A avaliação do modelo é um elemento auxiliar e também está sujeita a erros.
 

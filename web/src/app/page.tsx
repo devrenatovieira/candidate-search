@@ -1,10 +1,11 @@
 import { SearchBox } from "@/components/search-box";
+import { LogoMark } from "@/components/brand/logo";
 import { TopSuppliers } from "@/components/top-suppliers";
 import { PageHeader } from "@/components/shell/shell-context";
 import { YearSelect } from "@/components/ui/year-select";
 import { getHomeStats } from "@/lib/stats";
 import { getExpenseYears } from "@/lib/queries";
-import { formatBRL } from "@/lib/format";
+import { formatBRL, formatBRLCompact } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -19,72 +20,78 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const heroStats = [
     { label: "pessoas", value: stats.people.toLocaleString("pt-BR") },
     { label: "candidaturas", value: stats.candidacies.toLocaleString("pt-BR") },
-    { label: "doações recebidas", value: formatBRL(stats.donationsTotalCents), tone: "green" as const },
-    { label: "despesas contratadas", value: formatBRL(stats.expensesTotalCents) },
+    {
+      label: "doações recebidas",
+      value: formatBRLCompact(stats.donationsTotalCents),
+      exact: formatBRL(stats.donationsTotalCents),
+      tone: "green" as const,
+    },
+    {
+      label: "despesas contratadas",
+      value: formatBRLCompact(stats.expensesTotalCents),
+      exact: formatBRL(stats.expensesTotalCents),
+    },
     { label: year ? "eleição" : "período coberto", value: stats.years },
   ];
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <PageHeader
-        group="EloSys"
+        group="Candidate Search"
         current="Início"
         actions={<YearSelect basePath="/" years={expenseYears} value={year} allLabel="todos os anos" />}
       />
 
-      <div
-        className="animate-in relative overflow-hidden rounded-[var(--r-page)] border border-[var(--border-1)] px-6 py-16 sm:px-12 sm:py-20"
-      >
-        <div className="hero-glow" aria-hidden />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(900px 420px at 22% 30%, #000, transparent 72%)",
-          }}
-        />
-        <div className="relative max-w-2xl">
-          <div className="mono-label mb-4">busca de dados públicos · CPF/CNPJ</div>
-          <h1 className="text-[clamp(30px,5vw,48px)] leading-[1.06] font-medium tracking-tight text-balance">
-            Ficha pública de <span className="text-[var(--muted)]">qualquer candidato</span> brasileiro
-            <span className="text-[var(--accent-2)]">.</span>
+      <section className="hero animate-in" aria-labelledby="hero-title">
+        <LogoMark className="hero__mark" size={340} />
+        <div className="relative">
+          <h1 id="hero-title" className="hero__title">
+            Consulte a ficha pública de qualquer candidato brasileiro
           </h1>
-          <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[var(--muted)]">
-            Busque por nome ou CPF. Cada campo mostra de qual arquivo do TSE ele saiu, quando foi
-            baixado e o hash que comprova que não foi alterado.
+          <p className="hero__lede">
+            Candidaturas, doações, despesas de campanha e bens declarados de 2014 a 2026, organizados por
+            pessoa. Cada número mostra de qual arquivo oficial saiu e o hash que comprova que não foi
+            alterado.
           </p>
           <div className="mt-8">
             <SearchBox />
           </div>
+          <p className="hero__sources">
+            Fontes: Tribunal Superior Eleitoral, Receita Federal e Portal da Transparência.
+          </p>
         </div>
-      </div>
+      </section>
 
-      <section className="animate-in flex flex-col gap-4" style={{ animationDelay: "80ms" }}>
+      <section className="animate-in flex flex-col gap-3" style={{ animationDelay: "60ms" }} aria-label="Números da base">
+        <h2 className="section-title">{year ? `A base em ${year}` : "A base em números"}</h2>
         <div className="kpis">
           {heroStats.map((s) => (
             <div key={s.label} className="kpi">
               <div className="kpi__label">{s.label}</div>
-              <div className={`kpi__value${s.tone === "green" ? " kpi__value--green" : ""}`}>{s.value}</div>
+              <div
+                className={`kpi__value${"tone" in s && s.tone === "green" ? " kpi__value--green" : ""}`}
+                title={"exact" in s ? s.exact : undefined}
+              >
+                {s.value}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <div className="animate-in" style={{ animationDelay: "150ms" }}>
+      <div className="animate-in" style={{ animationDelay: "120ms" }}>
         <TopSuppliers years={expenseYears} initialYear={year} />
       </div>
 
-      <div className="card animate-in max-w-2xl" style={{ animationDelay: "220ms" }}>
-        <div className="label mb-3">indício não é prova</div>
-        <p className="text-[13.5px] leading-relaxed text-[var(--muted)]">
-          O EloSys reúne dados que já são públicos por lei (registro de candidatura do TSE,
-          prestação de contas eleitorais, redes sociais declaradas) e os organiza por pessoa. Nada
-          aqui é acusação — é o dado bruto oficial, com a fonte exposta em cada campo, para que
-          qualquer um confira e vá além se quiser apurar.
+      <aside className="signal signal--medium animate-in max-w-3xl" style={{ animationDelay: "180ms" }}>
+        <div className="label mb-2">Indício não é prova</div>
+        <p className="text-[14px] leading-relaxed text-[var(--fg-2)]">
+          O Candidate Search reúne dados que já são públicos por lei (registro de candidatura do TSE,
+          prestação de contas eleitorais, redes sociais declaradas) e os organiza por pessoa. Nada aqui é
+          acusação: é o dado oficial, com a fonte exposta em cada campo, para que qualquer pessoa confira e
+          aprofunde a apuração.
         </p>
-      </div>
+      </aside>
     </div>
   );
 }

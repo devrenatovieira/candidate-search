@@ -2,6 +2,18 @@ export function formatBRL(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+/** Short form for headline figures, e.g. "R$ 26,7 bi". Pair with formatBRL in a title for the exact value. */
+export function formatBRLCompact(cents: number): string {
+  const v = cents / 100;
+  const units: Array<[number, string]> = [[1e12, "tri"], [1e9, "bi"], [1e6, "mi"], [1e3, "mil"]];
+  for (const [n, u] of units) {
+    if (Math.abs(v) >= n) {
+      return `R$ ${(v / n).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} ${u}`;
+    }
+  }
+  return formatBRL(cents);
+}
+
 export function formatCpfCnpj(digits: string | null): string {
   if (!digits) return "não disponível";
   return digits.length === 14 ? formatCnpj(digits) : formatCpf(digits);

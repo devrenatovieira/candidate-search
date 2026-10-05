@@ -129,7 +129,7 @@ export function EntityProfileView({
                       <span className="text-[13px]" style={{ color: "var(--fg-2)" }}>{s.category ?? "categoria n/d"}</span>
                     </div>
                     {s.fineAmountCents ? (
-                      <span className="flex-none font-mono text-[13px] text-elo-red">
+                      <span className="flex-none font-mono text-[13px] text-signal-red">
                         {formatBRL(s.fineAmountCents)}
                       </span>
                     ) : null}

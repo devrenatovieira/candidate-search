@@ -1,4 +1,4 @@
--- Elosys SQLite schema.
+-- Candidate Search SQLite schema.
 
 PRAGMA foreign_keys = ON;
 

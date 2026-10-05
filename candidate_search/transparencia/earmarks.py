@@ -20,7 +20,7 @@ from ..provenance import (
 )
 from ..util import brl_to_cents, digits_only, normalize_name, now_utc
 
-log = get_logger("elosys.transparencia.earmarks")
+log = get_logger("candidate_search.transparencia.earmarks")
 
 PARSER_NAME = "transparencia.earmarks"
 PARSER_VERSION = "1.0"

@@ -23,8 +23,8 @@ type Props = {
 };
 
 const AMOUNT_TONE: Record<Props["tone"], string> = {
-  green: "text-elo-green",
-  amber: "text-elo-amber",
+  green: "text-signal-green",
+  amber: "text-brand",
   neutral: "text-[var(--fg-2)]",
 };
 

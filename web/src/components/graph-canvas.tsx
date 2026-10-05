@@ -446,7 +446,7 @@ function GraphCanvasInner() {
                       onMouseDown={() => addNode(r)}
                       className="flex w-full items-center gap-3 border-b border-[var(--border-1)] px-3 py-2.5 text-left transition-colors last:border-0 hover:bg-[var(--hover)]"
                     >
-                      <span className="flex-none rounded-sm border border-[var(--border-1)] px-1.5 py-0.5 font-mono text-[8.5px] tracking-[0.08em] text-[var(--muted)] uppercase">
+                      <span className="flex-none rounded-sm border border-[var(--border-1)] px-1.5 py-0.5 font-mono text-[8.5px] text-[var(--muted)]">
                         {r.type === "person" ? "pessoa" : "empresa"}
                       </span>
                       <span className="min-w-0 flex-1 truncate text-[13px]">{r.label}</span>
@@ -500,15 +500,15 @@ function GraphCanvasInner() {
           {amountFilterActive ? ` (de ${nodes.length} · ${edges.length})` : ""}
         </span>
         {circularCount > 0 ? (
-          <span className="mono-label flex items-center gap-1.5 !text-elo-red">
-            <span className="size-1.5 animate-pulse rounded-full bg-elo-red" />
+          <span className="mono-label flex items-center gap-1.5 !text-signal-red">
+            <span className="size-1.5 animate-pulse rounded-full bg-signal-red" />
             {circularCount} em doação circular
           </span>
         ) : null}
         {truncatedNotice ? (
           <button
             onClick={() => setTruncatedNotice(null)}
-            className="mono-label !text-elo-amber"
+            className="mono-label !text-brand"
             title="clique pra dispensar"
           >
             ⚠ {truncatedNotice}
@@ -570,7 +570,7 @@ function GraphCanvasInner() {
               </button>
             </div>
             {selectedNode.data.sanctioned ? (
-              <div className="mt-2 font-mono text-[9.5px] text-elo-red">⚠ sanção federal (CEIS/CNEP)</div>
+              <div className="mt-2 font-mono text-[9.5px] text-signal-red">⚠ sanção federal (CEIS/CNEP)</div>
             ) : null}
             {selectedNode.data.registryStatus ? (
               <div className="mt-1 font-mono text-[9.5px] text-[var(--muted-2)]">
@@ -583,7 +583,7 @@ function GraphCanvasInner() {
                 {selectedEdges.map((e) => (
                   <div
                     key={e.id}
-                    className={`font-mono text-[10px] ${e.data?.circular ? "text-elo-red" : "text-[var(--muted)]"}`}
+                    className={`font-mono text-[10px] ${e.data?.circular ? "text-signal-red" : "text-[var(--muted)]"}`}
                   >
                     {e.source === selectedNode.id ? "→" : "←"}{" "}
                     {e.data?.kind === "donation" ? "doou pra" : "pagou"}{" "}
@@ -600,22 +600,22 @@ function GraphCanvasInner() {
                 onClick={() =>
                   router.push(selectedNode.id.length === 14 ? `/cnpj/${selectedNode.id}` : `/cpf/${selectedNode.id}`)
                 }
-                className="flex-1 rounded-sm bg-foreground py-2 font-mono text-[10px] tracking-[0.1em] text-background uppercase hover:bg-elo-amber"
+                className="btn btn--primary flex-1 justify-center"
               >
-                ver ficha completa
+                Ver ficha completa
               </button>
               <button
                 onClick={() => removeNode(selectedNode.id)}
-                className="rounded-sm border border-[var(--border-2)] px-3 py-2 font-mono text-[10px] tracking-[0.1em] text-[var(--muted)] uppercase hover:border-[var(--border-2)] hover:text-foreground"
+                className="btn"
               >
-                remover
+                Remover
               </button>
             </div>
           </div>
         ) : null}
       </div>
 
-      <div className="flex flex-wrap gap-4 border-t border-[var(--border-1)] px-6 py-3 font-mono text-[9px] tracking-[0.1em] text-[var(--muted-2)] uppercase">
+      <div className="flex flex-wrap gap-4 border-t border-[var(--border-1)] px-6 py-3 text-[12px] text-[var(--muted)]">
         {(Object.keys(NODE_COLOR) as Array<keyof typeof NODE_COLOR>).map((k) => (
           <span key={k} className="flex items-center gap-1.5">
             <span
@@ -626,13 +626,13 @@ function GraphCanvasInner() {
           </span>
         ))}
         <span className="ml-2 flex items-center gap-1.5">
-          <span className="inline-block h-[2px] w-4 bg-elo-green" /> doação
+          <span className="inline-block h-[2px] w-4 bg-signal-green" /> doação
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-[2px] w-4" style={{ background: "var(--accent-2)" }} /> pagamento
         </span>
-        <span className="flex items-center gap-1.5 !text-elo-red">
-          <span className="inline-block h-[2px] w-4 bg-elo-red" /> caminho de doação circular
+        <span className="flex items-center gap-1.5 !text-signal-red">
+          <span className="inline-block h-[2px] w-4 bg-signal-red" /> caminho de doação circular
         </span>
       </div>
     </div>

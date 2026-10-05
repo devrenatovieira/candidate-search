@@ -9,7 +9,7 @@ from statistics import median
 from ..log import RowCounter, get_logger, step
 from ..util import git_commit, now_utc
 
-log = get_logger("elosys.rules.disproportionate_expense")
+log = get_logger("candidate_search.rules.disproportionate_expense")
 
 RULE_NAME = "disproportionate_expense"
 RULE_VERSION = "2.0"
