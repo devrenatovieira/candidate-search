@@ -1,0 +1,30 @@
+# banco de dados — distribuído como release, não versionado (ver ADs/banco.md)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# downloads temporários do TSE / outras fontes (não guardamos o payload — ver ADs/confiabilidade.md §2)
+/dados_tmp/
+*.zip
+
+# logs de execução ad-hoc de crawlers (o *_report.json formal é o que se versiona)
+*.log
+
+# estado local/efêmero do Claude Code, não do projeto
+.claude/scheduled_tasks.lock
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# segredos — a chave da DeepSeek (ai-review) vai só por variável de ambiente
+.env
+.env.*
